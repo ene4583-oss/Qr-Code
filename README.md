@@ -137,3 +137,7 @@ Existing eight-column Products/Transactions sheets remain readable. Management o
 ## Employee IDs
 
 The movement form and administrator history show Employee ID. IDs are stored as text (including leading zeroes) in the existing `employee` column for compatibility. Do not rename that Sheet header. Old name values remain as originally submitted; they are not converted to IDs. Employee IDs are required but are not verified against a staff directory.
+
+## Print a selected group of products
+
+In **QR labels**, tick the products you want to print, or use **Select all** / **Clear selection**. The selection counter shows how many are selected. Choose **Generate labels**, then **Print / Save PDF**. Only checked active products are included, with their images and optional extra label text. Selecting none generates no labels. Changing the selection clears generated labels so an earlier selection cannot accidentally be printed. The product table's **Print QR** button selects only that product; additional products can then be checked. This update only needs Index.html replaced and the existing deployment updated; no backend or Sheet changes are required.
