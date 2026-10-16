@@ -1,0 +1,31 @@
+// Requires Playwright and Chromium. Run: node tests/browser.cjs
+const {chromium}=require('playwright'),assert=require('assert/strict'),fs=require('fs'),path=require('path'),http=require('http');
+const root=path.resolve(__dirname,'..');
+(async()=>{
+ const server=http.createServer((req,res)=>{res.setHeader('Content-Type','text/html');res.end(fs.readFileSync(path.join(root,'index.html')));});await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const url='http://127.0.0.1:'+server.address().port;
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+ try{
+ const p=await browser.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept(d.type()==='prompt'?'Test correction':undefined));
+ await p.route('https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/*',route=>route.fulfill({path:path.join(root,'assets/products',route.request().url().split('/').pop()),contentType:'image/jpeg'}));
+ await p.goto(url+'/?item=DU01');await p.waitForSelector('#item option',{state:'attached'});assert.equal(await p.locator('#item').inputValue(),'DU01');assert(!(await p.locator('#showInactive').isVisible()));
+ await p.click('#nav-admin');await p.fill('#adminPassword','demo123');await p.click('#loginButton');await p.waitForSelector('#alertDialog[open]');await p.click('#alertDialog button');
+ await p.click('text=+ Add product');await p.fill('#editCode','NEW99');await p.fill('#editName','New test item');await p.fill('#editUnit','PCS');await p.fill('#editOpening','12');await p.fill('#editThreshold','3');await p.click('#saveProductButton');await p.waitForSelector('#productDialog:not([open])',{state:'attached'});await p.waitForSelector('[data-code="NEW99"][data-action="edit"]');
+ await p.click('[data-code="NEW99"][data-action="edit"]');assert(await p.locator('#editCode').evaluate(i=>i.readOnly));await p.fill('#editName','Edited test item');await p.click('#saveProductButton');await p.waitForFunction(()=>document.querySelector('#inventoryRows').textContent.includes('Edited test item'));
+ await p.click('[data-code="NEW99"][data-action="print"]');await p.fill('#baseUrl','https://script.google.com/macros/s/test/exec');await p.fill('#labelNote','Store A · Shelf 2');await p.click('text=Generate labels');assert.equal(await p.locator('.qr-card').count(),1);assert.match(await p.locator('.qr-card').innerText(),/Store A · Shelf 2/);assert.equal(await p.locator('.label-no-photo').textContent(),'No product photo');
+ await p.selectOption('#labelProduct','DU01');await p.click('text=Generate labels');await p.waitForFunction(()=>document.querySelector('.label-photo').naturalWidth>0);assert.equal(await p.locator('.qr-card svg').count(),1);
+ await p.click('#nav-admin');await p.click('[data-code="NEW99"][data-action="delete"]');await p.waitForSelector('[data-code="NEW99"]',{state:'detached'});assert(!(await p.locator('#item').innerText()).includes('NEW99'));await p.check('#showInactive');await p.click('[data-code="NEW99"][data-action="delete"]');await p.waitForFunction(()=>document.querySelector('#item').textContent.includes('NEW99'));
+ // Actual photographed issue followed by administrator-only deletion.
+ await p.click('#nav-worker');await p.selectOption('#item','DU01');await p.fill('#employee','Test Worker');await p.fill('#quantity','1');await p.locator('#photo').setInputFiles(path.join(root,'assets/products/DU01.jpg'));await p.waitForSelector('#photoPreview:not(.hidden)');await p.click('#submitButton');await p.waitForFunction(()=>JSON.parse(localStorage.getItem('stockflow-v1')).transactions.length===1);
+ await p.click('#nav-admin');await p.waitForSelector('[data-delete-record]');await p.click('[data-delete-record]');await p.waitForFunction(()=>JSON.parse(localStorage.getItem('stockflow-v1')).transactions[0].deletedAt);assert.equal(await p.locator('[data-delete-record]').count(),0);assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('stockflow-v1')).transactions.length),1);
+ await p.click('#nav-worker');await p.click('#nav-admin');await p.waitForFunction(()=>document.querySelector('#inventoryRows tr td:nth-child(2)').textContent==='48');
+ await p.click('#logout');assert(!(await p.locator('[data-delete-record]').isVisible()));assert(!(await p.locator('#productPhotoForm').isVisible()));
+ await p.goto(url+'/?item=UNKNOWN');await p.waitForFunction(()=>document.getElementById('item').selectedIndex===-1);assert(await p.locator('#submitButton').isDisabled());
+ assert.deepEqual(errors,[]);
+ // Apps Script iframe boot: static HTML, async URL parameter callback and RPC.
+ const prod=await browser.newPage(),prodErrors=[];prod.on('pageerror',e=>prodErrors.push(e.message));
+ await prod.addInitScript(()=>{const catalog=[{code:'DU04',name:'Cable tie',unit:'PACK',category:'Daily Use',imageUrl:''}];const rpc={getCatalog:()=>catalog,getDeploymentUrl:()=> 'https://script.google.com/macros/s/test/exec',getAdmin:()=>({products:[{...catalog[0],opening:10,stock:10,threshold:3,ordered:false}],transactions:[]})};function runner(success=()=>{},failure=()=>{}){return new Proxy({}, {get:(_,k)=>k==='withSuccessHandler'?fn=>runner(fn,failure):k==='withFailureHandler'?fn=>runner(success,fn):(...args)=>setTimeout(()=>{try{success(rpc[k](...args));}catch(e){failure(e);}},0)});}window.google={script:{run:runner(),url:{getLocation:cb=>setTimeout(()=>cb({parameter:{item:'DU04'}}),5)}}};});
+ await prod.goto(url);await prod.waitForFunction(()=>document.getElementById('item').value==='DU04');assert(!(await prod.locator('#demoBanner').isVisible()));await prod.waitForFunction(()=>document.getElementById('baseUrl').value.endsWith('/exec'));await prod.click('#nav-admin');await prod.fill('#adminPassword','test');await prod.click('#loginButton');await prod.waitForSelector('#admin:not(.hidden)');assert(await prod.locator('#productPhotoForm').isVisible());assert.deepEqual(prodErrors,[]);
+ console.log('PASS browser: add/edit, immutable code, individual photo/QR/custom label, archive/restore, photographed issue/delete with audit retention and restored stock, admin-only controls, unknown QR safety, Apps Script iframe boot and deep link without templates; no JavaScript errors.');
+ }finally{await browser.close();server.close();}
+})().catch(e=>{console.error(e);process.exit(1);});

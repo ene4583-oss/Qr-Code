@@ -39,7 +39,7 @@ DU01–DU16 names and units come from the supplied inventory PDF. Product photos
    | ADMIN_EMAIL | Optional: reorder email recipient |
 
    Keep the password in Script Properties, never in source code, public files or spreadsheet cells.
-5. Run the `setup` function from the editor and grant the requested Google permissions. It creates Products, Transactions and Settings sheets without overwriting non-empty sheets. If ADMIN_EMAIL is configured, setup also requests email authorization. Settings is reserved for future use and currently unused.
+5. Run the `setup` function from the editor and grant the requested Google permissions. It creates Products, Transactions and Settings sheets without overwriting non-empty sheets. Administrator management operations add their required columns to the right of the original columns automatically. If ADMIN_EMAIL is configured, setup also requests email authorization. Settings is reserved for future use and currently unused.
 6. Import `products-import.csv` into **Products**, replacing that sheet's contents. Preserve the exact English header names and column order. This CSV contains PDF opening balances: DU01 = 10, others = 0. Thresholds start at 0. Check actual physical stock and set appropriate thresholds before use; do not import demo balances.
 7. Products columns are:
 
@@ -57,7 +57,7 @@ After updates, edit the **existing deployment** and select a new version to pres
 
 ## Stock and alert behavior
 
-Current stock is calculated as **opening balance + receipts − issues**. Transactions are append-only through the app. Avoid manually editing or deleting transaction rows.
+Current stock is calculated as **opening balance + receipts − issues**. Movement submissions append transaction rows. Administrators can void a mistaken record with a reason; the app excludes voided rows from stock and history while retaining the original row and photo for audit. Avoid manually editing or deleting spreadsheet rows.
 
 Apps Script uses a script lock to serialize movements and administrator updates. Request IDs prevent a retry of the same request from deducting stock twice. Editing the form creates a new request ID. After a timeout, retry the unchanged form first and confirm the result before starting another movement.
 
@@ -75,7 +75,7 @@ The production worker catalog endpoint omits stock quantities. Administrator ope
 
 Photos are required, compressed, and limited to 2MB by the backend. Users may choose an existing image; the app cannot prove a photo was taken live. Photos remain private in Drive. Give authorized administrators access through their Google accounts; the app password does not grant Drive permissions.
 
-This version does not include SMS, WhatsApp, purchase approval, supplier management, offline submission or change history. Google services have quotas. Stock calculations currently scan the transaction table; larger datasets need aggregation, pagination or a database.
+This version does not include SMS, WhatsApp, purchase approval, supplier management, offline submission or a full product edit history. Deleted transaction rows retain their deletion timestamp and reason. Google services have quotas. Stock calculations currently scan the transaction table; larger datasets need aggregation, pagination or a database.
 
 ## Validation
 
@@ -110,3 +110,26 @@ Backend simulations additionally cover upload authorization, invalid image forma
 ## Photo + QR printable labels
 
 The QR labels page now prints the product photo beside the QR code, followed by product code, name and unit. It uses the configured/uploaded photo first and falls back to the supplied PDF photos for DU01–DU16. Products without an available image show a placeholder. These fallback photos are public GitHub assets; product-image uploads remain in Drive. Printing waits for image decoding; choose A4, disable browser headers/footers and test-scan a printed label. The print layout uses two columns. Existing QR destination URLs stay unchanged.
+
+
+## Product management and correcting mistakes
+
+In **Manage inventory**, use **+ Add product**, **Edit**, **Delete product**, or **Restore product**. Product codes are unique, including archived products, and cannot be renamed because QR labels/history use them. Deleted products disappear from worker lists and cannot accept movements, but keep their balances, images and history. Use **Show deleted products** to restore one. Unit changes are blocked after any transaction exists. Opening balance changes affect current stock and require confirmation; use Stock in for normal receipts.
+
+In **Recent stock movements**, only administrators can use **Delete record**. Enter a reason and confirm. Deleting an issue adds its quantity back; deleting a receipt subtracts its quantity. A receipt cannot be deleted if this would make stock negative: correct related issue records first. Deletion is a logical void, not physical removal, retaining original row/photo, deletedAt and deleteReason for audit and duplicate-request safety. Repeated deletion does not reverse stock twice. A retry of a voided original movement is rejected. Void/correction operations update dashboard alerts but do not send threshold-crossing emails.
+
+**Print QR** on each product opens its printable label. Alternatively open **QR labels**, choose one product or all, enter an optional extra label such as a shelf name, generate and print/save PDF. Labels contain the product name, code, unit, photo when available, and QR. The production URL is loaded automatically from Apps Script. Test-scan labels after deployment.
+
+### Upgrade an existing deployment
+
+1. Keep the current working deployment selected while copying updated code; optionally make a spreadsheet backup first.
+2. Replace the contents of both Code.gs and Index.html from this repository and save. Do not change Script Properties, reimport CSV or delete any sheets.
+3. The HTML is now served directly using createHtmlOutputFromFile, without server-side scriptlets. QR parameters are read with google.script.url.getLocation inside the Apps Script iframe. Both files must be updated together.
+4. Use **Deploy → Test deployments** to validate the saved code as owner without replacing the working deployment. Check the catalog, administrator login, a test product and its QR label. No live Google deployment has been tested by the repository's local automated checks.
+5. Edit the existing deployment, choose **New version**, then deploy, retaining the existing /exec URL.
+
+Existing eight-column Products/Transactions sheets remain readable. Management operations add Products columns I/J (`active`, `deletedAt`) and Transactions columns I/J (`deletedAt`, `deleteReason`) as needed; blank active values mean active. Original headers, rows, balances, links and Script Properties are preserved. The app refuses unexpected column headers rather than overwriting them. Do not reorder sheet columns.
+
+### Management tests
+
+`node tests/backend.cjs` also tests additive headers, administrator-only management/deletion, duplicate and archived codes, editing, archive/restore, inactive stock rejection, unit protection, void audit retention, recalculated stock, repeated deletion and negative-balance protection. With Playwright and Chromium available, run `node tests/browser.cjs` for CRUD, single-product QR/photo/extra-label generation, recorded movement deletion, invalid QR safety and a mocked Apps Script iframe startup. CHROMIUM_PATH can override the browser executable. These are local tests, not a claim of live Google deployment verification.

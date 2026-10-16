@@ -1,8 +1,9 @@
 /** Deploy as a web app: execute as owner. Set Script Properties first; see README. */
-function doGet(e) {
-  var t = HtmlService.createTemplateFromFile('Index');
-  t.itemCode = (e && e.parameter.item) || '';
-  return t.evaluate().setTitle('StockFlow Inventory management').addMetaTag('viewport', 'width=device-width, initial-scale=1');
+function doGet() {
+  // Serve static HTML: no template compiler can rewrite client JavaScript.
+  // The browser reads ?item via google.script.url.getLocation.
+  return HtmlService.createHtmlOutputFromFile('Index').setTitle('StockFlow Inventory management')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 function db_() {
   var id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
@@ -29,12 +30,12 @@ function rows_(name) {
   return v.filter(function(r){return r[0] !== '';}).map(function(r){var o={};h.forEach(function(k,i){o[k]=r[i];});return o;});
 }
 function products_() {
-  var p=rows_('Products'), tx=rows_('Transactions'), sums={};
+  var p=rows_('Products'), tx=rows_('Transactions').filter(function(t){return !t.deletedAt;}), sums={};
   tx.forEach(function(t){sums[t.code]=(sums[t.code]||0)+(t.type==='IN'?1:-1)*Number(t.quantity);});
   return p.map(function(x){x.opening=Number(x.opening)||0;x.threshold=Number(x.threshold)||0;x.stock=Math.round((x.opening+(sums[x.code]||0))*1000)/1000;x.ordered=x.ordered===true||x.ordered==='TRUE';return x;});
 }
 function getCatalog() {
-  return rows_('Products').map(function(p){return {code:String(p.code),name:String(p.name),category:String(p.category),unit:String(p.unit),imageUrl:catalogImage_(p.imageUrl)};});
+  return rows_('Products').filter(function(p){return !inactive_(p);}).map(function(p){return {code:String(p.code),name:String(p.name),category:String(p.category),unit:String(p.unit),imageUrl:catalogImage_(p.imageUrl)};});
 }
 function verifyAdmin_(password) {
   var expected=PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');
@@ -42,7 +43,7 @@ function verifyAdmin_(password) {
 }
 function getAdmin(password) {
   verifyAdmin_(password);
-  return {products:products_(),transactions:rows_('Transactions').reverse().map(function(t){t.time=new Date(t.time).toISOString();return t;})};
+  return {products:products_(),transactions:rows_('Transactions').filter(function(t){return !t.deletedAt;}).reverse().map(function(t){t.time=new Date(t.time).toISOString();return t;})};
 }
 function safe_(s) { s=String(s||'').trim(); return /^[=+@\-]/.test(s)?"'"+s:s; }
 function submitMovement(data) {
@@ -50,6 +51,7 @@ function submitMovement(data) {
   try {
     if (!data || !/^[A-Za-z0-9_-]{12,100}$/.test(String(data.requestId))) throw new Error('Invalid request ID');
     var existing=rows_('Transactions').filter(function(t){return t.requestId===data.requestId;});
+    if(existing.length&&existing[0].deletedAt) throw new Error('This request was deleted by an administrator. Start a new form if needed.');
     if(existing.length) return {ok:true,message:'This request was already recorded. Do not submit it again.'};
     var qty=Number(data.quantity);
     if (!isFinite(qty)||qty<=0||qty>1000000||Math.abs(Math.round(qty*1000)-qty*1000)>0.000001) throw new Error('Quantity must be positive, with at most three decimal places.');
@@ -57,7 +59,7 @@ function submitMovement(data) {
     if (!String(data.employee||'').trim()||String(data.employee).length>100||String(data.note||'').length>1000) throw new Error('Enter a name. Notes must not exceed 1,000 characters.');
     if (data.type==='IN') verifyAdmin_(data.adminPassword);
     var p=products_().filter(function(x){return x.code===data.code;})[0];
-    if (!p) throw new Error('Product not found');
+    if (!p||inactive_(p)) throw new Error('Product not found or inactive');
     if(data.type==='OUT'&&qty>p.stock) throw new Error('Unable to issue items. Please contact the administrator to check stock.');
     var match=String(data.photo||'').match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
     if(!match) throw new Error('Please provide a JPG, PNG or WebP photo.');
@@ -130,3 +132,75 @@ function uploadProductPhoto(password,code,dataUrl) {
     return {ok:true,message:'Product photo saved. Workers will see it when they reload the page.'};
   } finally {lock.releaseLock();}
 }
+
+
+function inactive_(p) {return p.active===false||String(p.active).toUpperCase()==='FALSE';}
+function ensureColumns_(name,expected) {
+  var s=db_().getSheetByName(name);
+  if(!s)throw new Error('Missing '+name+' sheet. Run setup first.');
+  var h=s.getDataRange().getValues()[0];
+  for(var i=0;i<expected.length;i++) {
+    if(h[i]&&h[i]!==expected[i]) throw new Error('Unexpected '+name+' column '+(i+1)+'. Check sheet headers.');
+    if(!h[i])s.getRange(1,i+1).setValue(expected[i]);
+  }
+  return s;
+}
+function productSheet_(){return ensureColumns_('Products',['code','name','category','unit','opening','threshold','imageUrl','ordered','active','deletedAt']);}
+function transactionSheet_(){return ensureColumns_('Transactions',['requestId','time','code','type','quantity','employee','note','photoUrl','deletedAt','deleteReason']);}
+function number_(v,label) {
+  if(v===''||v===null||v===undefined)throw new Error(label+' is required.');
+  var n=Number(v);
+  if(!isFinite(n)||n<0||n>1000000000||Math.abs(n*1000-Math.round(n*1000))>0.00001)throw new Error(label+' must be non-negative with at most 3 decimal places.');
+  return n;
+}
+function saveProduct(password,data) {
+  verifyAdmin_(password);
+  if(!data)throw new Error('Product details are required.');
+  var code=String(data.code||'').trim().toUpperCase(),original=String(data.originalCode||'');
+  if(!/^[A-Z0-9][A-Z0-9_-]{0,39}$/.test(code))throw new Error('Use a unique product code of 1–40 letters, numbers, hyphens or underscores.');
+  if(original&&original!==code)throw new Error('Product codes cannot be changed because QR labels and history use them.');
+  var name=String(data.name||'').trim(),unit=String(data.unit||'').trim(),category=String(data.category||'').trim();
+  if(!name||name.length>200||!unit||unit.length>30||category.length>100)throw new Error('Enter a name (max 200), unit (max 30) and category (max 100).');
+  var opening=number_(data.opening,'Opening stock'),threshold=number_(data.threshold,'Threshold'),url=String(data.imageUrl||'').trim();
+  if(url&&!/^https:\/\/[^\s<>"']{1,2000}$/.test(url)&&!/^drive:[A-Za-z0-9_-]+$/.test(url))throw new Error('Enter an HTTPS image URL or retain the uploaded photo reference.');
+  var lock=LockService.getScriptLock();lock.waitLock(30000);
+  try {
+    var s=productSheet_(),v=s.getDataRange().getValues(),row=0;
+    for(var i=1;i<v.length;i++)if(v[i][0]===code){row=i+1;break;}
+    if(original&&!row)throw new Error('Product no longer exists. Refresh and try again.');
+    if(!original&&row)throw new Error('This code already exists, including inactive products. Use Edit or Restore.');
+    var tx=rows_('Transactions').filter(function(t){return t.code===code;}),current=opening;
+    tx.forEach(function(t){if(!t.deletedAt)current+=(t.type==='IN'?1:-1)*Number(t.quantity);});
+    if(current<-0.00001)throw new Error('Opening stock would make current stock negative.');
+    if(row&&tx.length&&String(v[row-1][3])!==unit)throw new Error('Unit cannot change after transactions exist. Create a new product code for a different unit.');
+    var values=[code,safe_(name),safe_(category),safe_(unit),opening,threshold,url,row?v[row-1][7]:false,row?!inactive_({active:v[row-1][8]}):true,row?(v[row-1][9]||''):''];
+    if(row)s.getRange(row,1,1,10).setValues([values]);else s.appendRow(values);
+    SpreadsheetApp.flush();return {ok:true,message:original?'Product updated.':'Product added.'};
+  } finally {lock.releaseLock();}
+}
+function setProductActive(password,code,active) {
+  verifyAdmin_(password);
+  if(typeof active!=='boolean')throw new Error('Invalid product status.');
+  var lock=LockService.getScriptLock();lock.waitLock(30000);
+  try {var s=productSheet_(),v=s.getDataRange().getValues();
+    for(var i=1;i<v.length;i++)if(v[i][0]===code){s.getRange(i+1,9).setValue(active);s.getRange(i+1,10).setValue(active?'':new Date().toISOString());SpreadsheetApp.flush();return {ok:true};}
+    throw new Error('Product not found');
+  } finally {lock.releaseLock();}
+}
+function deleteTransaction(password,requestId,reason) {
+  verifyAdmin_(password);reason=String(reason||'').trim();
+  if(!reason||reason.length>500)throw new Error('Enter a deletion reason (max 500 characters).');
+  var lock=LockService.getScriptLock();lock.waitLock(30000);
+  try {var s=transactionSheet_(),v=s.getDataRange().getValues(),row=0;
+    for(var i=1;i<v.length;i++)if(v[i][0]===requestId){row=i+1;break;}
+    if(!row)throw new Error('Record not found');
+    if(v[row-1][8])return {ok:true,message:'This record was already deleted.'};
+    var record=v[row-1],p=products_().filter(function(x){return x.code===record[2];})[0];
+    if(!p)throw new Error('Product missing. Restore its sheet row before deleting this record.');
+    var next=p.stock+(record[3]==='IN'?-1:1)*Number(record[4]);
+    if(next<-0.00001)throw new Error('Deleting this receipt would make stock negative. Correct the related issue records first.');
+    s.getRange(row,9,1,2).setValues([[new Date().toISOString(),safe_(reason)]]);
+    SpreadsheetApp.flush();return {ok:true,message:'Record deleted. Stock has been recalculated.'};
+  } finally {lock.releaseLock();}
+}
+function getDeploymentUrl(){return ScriptApp.getService().getUrl()||'';}
