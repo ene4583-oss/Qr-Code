@@ -12,7 +12,7 @@ python3 -m http.server 8080 --bind 127.0.0.1
 
 The demo administrator password is **demo123**. Demo data is stored only in this browser's localStorage. It is not connected to Google Sheets, is not synchronized between users, and is erased when browser site data is cleared. Photos can exhaust browser storage. Demo stock levels and thresholds are illustrative.
 
-DU01–DU16 names and units come from the supplied inventory PDF. Product images are placeholders. Additional products, including other categories and DU17–DU18, must be imported separately. The demo catalog is included in the page source; it does not contain production stock figures.
+DU01–DU16 names and units come from the supplied inventory PDF. Product photos for DU01–DU16 are extracted from the supplied QR PDF and stored in `assets/products`. The standalone demo still uses placeholders until image URLs are supplied. Additional products, including other categories and DU17–DU18, must be imported separately. The demo catalog is included in the page source; it does not contain production stock figures.
 
 ## Features
 
@@ -90,3 +90,7 @@ Google services are mocked in this test. It verifies catalog stock privacy, admi
 Browser checks cover product deep links, worker stock visibility, invalid/valid administrator sign-in, reorder dialogs, threshold/order updates, photographed stock out 48→45, photographed stock in 45→65, 16 generated QR labels, sign-out and mobile layout. Real Google authorization, Sheets writes, Drive uploads, email delivery and phone camera behavior must still be verified in your Google deployment. No live Google integration is claimed.
 
 QR generation uses vendored qrcode-generator 1.4.4 with its original MIT license notice. The website requires no runtime CDN download.
+
+## Add photos to an existing deployment
+
+No code redeployment is needed. In Products, verify rows 2–17 are DU01–DU16 in order, then paste the 16 lines in `product-image-urls.txt` into G2 (imageUrl). Do not replace the whole sheet or change balances/transactions. Reload the worker page to load updated images. Images are publicly served from this repository. DU03 has inconsistent names in the source documents: inventory says Latex glove, while the QR PDF says Cloth Glove; confirm the product before operational use.

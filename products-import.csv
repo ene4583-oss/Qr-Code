@@ -1,17 +1,17 @@
 code,name,category,unit,opening,threshold,imageUrl,ordered
-DU01,Long glove 45cm,Daily Use,PAIR,10,0,,FALSE
-DU02,Cotton glove,Daily Use,PAIR,0,0,,FALSE
-DU03,Latex glove,Daily Use,PAIR,0,0,,FALSE
-DU04,Cable tie 4X200MM 1 PACK 500PCS,Daily Use,PACK,0,0,,FALSE
-DU05,Face Mask Disposable 50pcs,Daily Use,PCS,0,0,,FALSE
-DU06,Hairnet,Daily Use,PCS,0,0,,FALSE
-DU07,Glue Mouse Sticker,Daily Use,PCS,0,0,,FALSE
-DU08,Fish Net 20cm,Daily Use,PCS,0,0,,FALSE
-DU09,Engine oil 7 L,Daily Use,BTL,0,0,,FALSE
-DU10,Battery water 1 L E-Power,Daily Use,BTL,0,0,,FALSE
-DU11,Clorox 4 L,Daily Use,BTL,0,0,,FALSE
-DU12,Kiwi knife,Daily Use,PCS,0,0,,FALSE
-DU13,Powder detergent Lemon 5 KG,Daily Use,PACK,0,0,,FALSE
-DU14,Cement 1 PACK,Daily Use,KG,0,0,,FALSE
-DU15,Foldable Table 6inch 180cm,Daily Use,PCS,0,0,,FALSE
-DU16,Platic Shovel,Daily Use,PCS,0,0,,FALSE
+DU01,Long glove 45cm,Daily Use,PAIR,10,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU01.jpg,FALSE
+DU02,Cotton glove,Daily Use,PAIR,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU02.jpg,FALSE
+DU03,Latex glove,Daily Use,PAIR,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU03.jpg,FALSE
+DU04,Cable tie 4X200MM 1 PACK 500PCS,Daily Use,PACK,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU04.jpg,FALSE
+DU05,Face Mask Disposable 50pcs,Daily Use,PCS,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU05.jpg,FALSE
+DU06,Hairnet,Daily Use,PCS,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU06.jpg,FALSE
+DU07,Glue Mouse Sticker,Daily Use,PCS,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU07.jpg,FALSE
+DU08,Fish Net 20cm,Daily Use,PCS,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU08.jpg,FALSE
+DU09,Engine oil 7 L,Daily Use,BTL,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU09.jpg,FALSE
+DU10,Battery water 1 L E-Power,Daily Use,BTL,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU10.jpg,FALSE
+DU11,Clorox 4 L,Daily Use,BTL,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU11.jpg,FALSE
+DU12,Kiwi knife,Daily Use,PCS,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU12.jpg,FALSE
+DU13,Powder detergent Lemon 5 KG,Daily Use,PACK,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU13.jpg,FALSE
+DU14,Cement 1 PACK,Daily Use,KG,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU14.jpg,FALSE
+DU15,Foldable Table 6inch 180cm,Daily Use,PCS,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU15.jpg,FALSE
+DU16,Platic Shovel,Daily Use,PCS,0,0,https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/DU16.jpg,FALSE
