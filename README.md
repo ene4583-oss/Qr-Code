@@ -141,3 +141,11 @@ The movement form and administrator history show Employee ID. IDs are stored as 
 ## Print a selected group of products
 
 In **QR labels**, tick the products you want to print, or use **Select all** / **Clear selection**. The selection counter shows how many are selected. Choose **Generate labels**, then **Print / Save PDF**. Only checked active products are included, with their images and optional extra label text. Selecting none generates no labels. Changing the selection clears generated labels so an earlier selection cannot accidentally be printed. The product table's **Print QR** button selects only that product; additional products can then be checked. This update only needs Index.html replaced and the existing deployment updated; no backend or Sheet changes are required.
+
+## Company name and logo
+
+Administrators can use **Manage inventory → Company settings** to edit the company name, upload/replace a logo, or remove the current logo. Save to update the website header, footer and newly generated QR labels. Other devices must reload, and previously printed labels remain unchanged. Names are limited to 100 characters. JPG, PNG and WebP uploads are resized to fit a 256-pixel square (smaller when necessary); transparency is preserved when the browser supports WebP.
+
+Settings are stored as `companyName` and `companyLogo` in the existing Settings sheet. The small image data is limited to 45,000 characters to stay below Sheets' per-cell limit; no public Drive sharing or new permissions are required. Unrelated settings are preserved. Reading branding is public because it is displayed to workers; changing it requires the administrator password on the server. Demo branding is browser-only. No setup rerun, database reimport or QR destination changes are needed. Replace both Code.gs and Index.html and test the saved code before publishing a new version of the existing deployment.
+
+Automated checks cover default branding, administrator access checks, invalid logo/name rejection, persistence, logo removal, unrelated settings, header and QR label display, and the Apps Script iframe startup path. Live Google deployment still requires validation in the owner's account.

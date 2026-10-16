@@ -204,3 +204,28 @@ function deleteTransaction(password,requestId,reason) {
   } finally {lock.releaseLock();}
 }
 function getDeploymentUrl(){return ScriptApp.getService().getUrl()||'';}
+
+function getBranding() {
+  var settings=rows_('Settings'),name='StockFlow',logo='';
+  settings.forEach(function(r){if(r.key==='companyName'&&String(r.value||'').trim())name=String(r.value);if(r.key==='companyLogo')logo=String(r.value||'');});
+  if(!/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(logo)||logo.length>45000)logo='';
+  return {companyName:name,logoData:logo};
+}
+function saveBranding(password,data) {
+  verifyAdmin_(password);
+  var name=String(data&&data.companyName||'').trim(),logo=String(data&&data.logoData||'');
+  if(!name||name.length>100||/^[=+@\-]/.test(name))throw new Error('Enter a company name of 1–100 characters, without a spreadsheet formula prefix.');
+  if(logo) {
+    var m=logo.match(/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/);
+    if(!m||logo.length>45000)throw new Error('Logo is too large or has an unsupported format. Please choose a smaller JPG, PNG or WebP image.');
+    var bytes=Utilities.base64Decode(m[2]),sig=bytes.slice(0,12).map(function(b){return b&255;});
+    var valid=m[1]==='image/jpeg'?sig[0]===255&&sig[1]===216&&sig[2]===255:m[1]==='image/png'?sig.slice(0,8).join(',')==='137,80,78,71,13,10,26,10':sig.slice(0,4).join(',')==='82,73,70,70'&&sig.slice(8,12).join(',')==='87,69,66,80';
+    if(!valid)throw new Error('Invalid logo image content.');
+  }
+  var lock=LockService.getScriptLock();lock.waitLock(30000);
+  try {
+    var s=ensureColumns_('Settings',['key','value']),rows=s.getDataRange().getValues();
+    [['companyName',name],['companyLogo',logo]].forEach(function(pair){var row=0;for(var i=1;i<rows.length;i++)if(rows[i][0]===pair[0]){row=i+1;break;}if(row)s.getRange(row,2).setValue(pair[1]);else s.appendRow(pair);});
+    SpreadsheetApp.flush();return {companyName:name,logoData:logo};
+  } finally {lock.releaseLock();}
+}
