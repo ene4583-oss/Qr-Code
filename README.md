@@ -106,3 +106,7 @@ Uploads use the existing PHOTO_FOLDER_ID without making the folder public. Produ
 Workers on other devices must reload to see a replacement photo. Old uploaded product photos are retained in Drive rather than deleted, allowing manual recovery; this consumes Drive storage. A deleted/inaccessible image falls back to a placeholder. Drive/Apps Script quotas and catalog payload size apply, so this approach is intended for a small catalog. Local demo uploads remain browser-only.
 
 Backend simulations additionally cover upload authorization, invalid image formats, unknown products, unchanged stock, linked image delivery and unavailable image fallback. Local browser verification covers preview/upload, worker rendering, persistence after reload, invalid-file rejection and mobile layout. Live Google upload remains a deployment check in the owner's account.
+
+## Photo + QR printable labels
+
+The QR labels page now prints the product photo beside the QR code, followed by product code, name and unit. It uses the configured/uploaded photo first and falls back to the supplied PDF photos for DU01–DU16. Products without an available image show a placeholder. These fallback photos are public GitHub assets; product-image uploads remain in Drive. Printing waits for image decoding; choose A4, disable browser headers/footers and test-scan a printed label. The print layout uses two columns. Existing QR destination URLs stay unchanged.
