@@ -56,7 +56,7 @@ function submitMovement(data) {
     var qty=Number(data.quantity);
     if (!isFinite(qty)||qty<=0||qty>1000000||Math.abs(Math.round(qty*1000)-qty*1000)>0.000001) throw new Error('Quantity must be positive, with at most three decimal places.');
     if (['IN','OUT'].indexOf(data.type)<0) throw new Error('Invalid movement type');
-    if (!String(data.employee||'').trim()||String(data.employee).length>100||String(data.note||'').length>1000) throw new Error('Enter a name. Notes must not exceed 1,000 characters.');
+    if (!String(data.employee||'').trim()||String(data.employee).length>100||String(data.note||'').length>1000) throw new Error('Enter an employee ID. Notes must not exceed 1,000 characters.');
     if (data.type==='IN') verifyAdmin_(data.adminPassword);
     var p=products_().filter(function(x){return x.code===data.code;})[0];
     if (!p||inactive_(p)) throw new Error('Product not found or inactive');

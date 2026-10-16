@@ -17,7 +17,7 @@ DU01–DU16 names and units come from the supplied inventory PDF. Product photos
 ## Features
 
 - Workers see product name, code, category, image and unit, without stock quantities.
-- Workers enter their name, quantity, purpose/notes and a required photo to issue stock.
+- Workers enter their employee ID, quantity, purpose/notes and a required photo to issue stock.
 - Stock receipts require the administrator password.
 - Administrators can view stock, the latest 100 movements and photo links, adjust each product's threshold, and mark products as ordered.
 - The administrator page polls every 30 seconds and opens a dialog for newly detected reorder items.
@@ -69,7 +69,7 @@ On-page alert dialogs require the administrator page to be open. **This version 
 
 ## Access and limitations
 
-This is a first version for a small internal team. It uses a shared administrator password, not individual administrator accounts. Worker names are self-reported, not verified identities. If deployed anonymously, anyone with the link can submit stock issues; a QR code is not authentication. Choose account-based access restrictions or add worker authentication and abuse controls according to your operational requirements before production use.
+This is a first version for a small internal team. It uses a shared administrator password, not individual administrator accounts. Employee IDs are self-reported, not verified identities. If deployed anonymously, anyone with the link can submit stock issues; a QR code is not authentication. Choose account-based access restrictions or add worker authentication and abuse controls according to your operational requirements before production use.
 
 The production worker catalog endpoint omits stock quantities. Administrator operations are checked on the server; hiding interface elements is not the access control.
 
@@ -133,3 +133,7 @@ Existing eight-column Products/Transactions sheets remain readable. Management o
 ### Management tests
 
 `node tests/backend.cjs` also tests additive headers, administrator-only management/deletion, duplicate and archived codes, editing, archive/restore, inactive stock rejection, unit protection, void audit retention, recalculated stock, repeated deletion and negative-balance protection. With Playwright and Chromium available, run `node tests/browser.cjs` for CRUD, single-product QR/photo/extra-label generation, recorded movement deletion, invalid QR safety and a mocked Apps Script iframe startup. CHROMIUM_PATH can override the browser executable. These are local tests, not a claim of live Google deployment verification.
+
+## Employee IDs
+
+The movement form and administrator history show Employee ID. IDs are stored as text (including leading zeroes) in the existing `employee` column for compatibility. Do not rename that Sheet header. Old name values remain as originally submitted; they are not converted to IDs. Employee IDs are required but are not verified against a staff directory.
