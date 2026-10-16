@@ -94,3 +94,15 @@ QR generation uses vendored qrcode-generator 1.4.4 with its original MIT license
 ## Add photos to an existing deployment
 
 No code redeployment is needed. In Products, verify rows 2–17 are DU01–DU16 in order, then paste the 16 lines in `product-image-urls.txt` into G2 (imageUrl). Do not replace the whole sheet or change balances/transactions. Reload the worker page to load updated images. Images are publicly served from this repository. DU03 has inconsistent names in the source documents: inventory says Latex glove, while the QR PDF says Cloth Glove; confirm the product before operational use.
+
+## Administrator product photo uploads
+
+The **Manage inventory → Product photo upload** section lets an administrator choose a product, select a JPG/PNG/WebP image, preview it and upload it. Images are resized to at most 900 pixels and compressed before submission. This operation never changes stock or transaction photos.
+
+Update both `Code.gs` and `Index.html` in Apps Script, save, then edit the existing deployment and choose **New version**. Preserve the existing deployment URL and all Script Properties. No `setup` rerun, CSV reimport or schema change is required. Test with one product after deployment.
+
+Uploads use the existing PHOTO_FOLDER_ID without making the folder public. Products.imageUrl is automatically set to an internal `drive:<file ID>` reference. The catalog reads that explicitly linked product image and returns image data to workers; transaction photos stay private. Do not replace these references with ordinary Drive preview links. Existing HTTPS image links continue to work. Product display images are visible to everyone allowed to access the website.
+
+Workers on other devices must reload to see a replacement photo. Old uploaded product photos are retained in Drive rather than deleted, allowing manual recovery; this consumes Drive storage. A deleted/inaccessible image falls back to a placeholder. Drive/Apps Script quotas and catalog payload size apply, so this approach is intended for a small catalog. Local demo uploads remain browser-only.
+
+Backend simulations additionally cover upload authorization, invalid image formats, unknown products, unchanged stock, linked image delivery and unavailable image fallback. Local browser verification covers preview/upload, worker rendering, persistence after reload, invalid-file rejection and mobile layout. Live Google upload remains a deployment check in the owner's account.

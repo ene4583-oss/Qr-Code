@@ -34,7 +34,7 @@ function products_() {
   return p.map(function(x){x.opening=Number(x.opening)||0;x.threshold=Number(x.threshold)||0;x.stock=Math.round((x.opening+(sums[x.code]||0))*1000)/1000;x.ordered=x.ordered===true||x.ordered==='TRUE';return x;});
 }
 function getCatalog() {
-  return rows_('Products').map(function(p){return {code:String(p.code),name:String(p.name),category:String(p.category),unit:String(p.unit),imageUrl:String(p.imageUrl||'')};});
+  return rows_('Products').map(function(p){return {code:String(p.code),name:String(p.name),category:String(p.category),unit:String(p.unit),imageUrl:catalogImage_(p.imageUrl)};});
 }
 function verifyAdmin_(password) {
   var expected=PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');
@@ -88,4 +88,45 @@ function updateProduct(password,code,threshold,ordered) {
   if(!isFinite(n)||n<0)throw new Error('The reorder threshold must be a non-negative number.');
   var lock=LockService.getScriptLock();lock.waitLock(30000);
   try {var s=db_().getSheetByName('Products'),v=s.getDataRange().getValues();for(var i=1;i<v.length;i++)if(v[i][0]===code){s.getRange(i+1,6).setValue(n);s.getRange(i+1,8).setValue(Boolean(ordered));return {ok:true};}throw new Error('Product not found');} finally {lock.releaseLock();}
+}
+
+// Product photos stay private in the existing photo folder. Only explicitly linked
+// product images are served to workers; transaction photos are never in the catalog.
+function catalogImage_(value) {
+  value=String(value||'');
+  if (value.indexOf('drive:')!==0) return value;
+  try {
+    var id=value.substring(6);
+    if(!/^[A-Za-z0-9_-]+$/.test(id)) return '';
+    var file=DriveApp.getFileById(id),parents=file.getParents(),folderId=PropertiesService.getScriptProperties().getProperty('PHOTO_FOLDER_ID'),allowed=false;
+    while(parents.hasNext()) if(parents.next().getId()===folderId) allowed=true;
+    if(!allowed||file.getName().indexOf('product-')!==0||file.getSize()>2*1024*1024) return '';
+    var blob=file.getBlob(),mime=blob.getContentType();
+    if(['image/jpeg','image/png','image/webp'].indexOf(mime)<0) return '';
+    return 'data:'+mime+';base64,'+Utilities.base64Encode(blob.getBytes());
+  } catch(e) {console.error('Product image unavailable: '+e.message);return '';}
+}
+function uploadProductPhoto(password,code,dataUrl) {
+  verifyAdmin_(password);
+  var match=String(dataUrl||'').match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+  if(!match||match[2].length>2800000) throw new Error('Choose a JPG, PNG or WebP image under 2MB.');
+  var bytes=Utilities.base64Decode(match[2]);
+  if(!bytes.length||bytes.length>2*1024*1024) throw new Error('Product image must be under 2MB.');
+  var signature=bytes.slice(0,12).map(function(b){return b&255;});
+  var valid=match[1]==='image/jpeg'?signature[0]===255&&signature[1]===216&&signature[2]===255:
+    match[1]==='image/png'?signature.slice(0,8).join(',')==='137,80,78,71,13,10,26,10':
+    signature.slice(0,4).join(',')==='82,73,70,70'&&signature.slice(8,12).join(',')==='87,69,66,80';
+  if(!valid) throw new Error('The file content does not match its image format.');
+  var lock=LockService.getScriptLock();lock.waitLock(30000);
+  try {
+    var s=db_().getSheetByName('Products'),rows=s.getDataRange().getValues(),row=0;
+    for(var i=1;i<rows.length;i++)if(rows[i][0]===code){row=i+1;break;}
+    if(!row) throw new Error('Product not found');
+    var folderId=PropertiesService.getScriptProperties().getProperty('PHOTO_FOLDER_ID');
+    if(!folderId) throw new Error('The administrator has not configured the photo folder.');
+    var file=DriveApp.getFolderById(folderId).createFile(Utilities.newBlob(bytes,match[1],'product-'+code+'-'+Utilities.getUuid()+'.'+match[1].split('/')[1]));
+    try {s.getRange(row,7).setValue('drive:'+file.getId());SpreadsheetApp.flush();}
+    catch(e){file.setTrashed(true);throw e;}
+    return {ok:true,message:'Product photo saved. Workers will see it when they reload the page.'};
+  } finally {lock.releaseLock();}
 }
