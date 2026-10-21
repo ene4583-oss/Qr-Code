@@ -22,3 +22,7 @@ Proposed project duration: 12 October–7 November 2026 (approximately one month
 - [在线阅读／复制文字](Project_1_Internship_Report_Week_1_2_Chinese.md)
 
 These are review drafts, not signed or verified internship records. Dates, meeting details and completed activities must be checked against actual work. Activities from 22 October onward were planned when these drafts were prepared. Supervisor remarks remain blank.
+
+## GD008 format correction
+
+The Word files now retain the actual Engineering/Science WEEKLY & MONTHLY RECORDS section from the uploaded GD008 template, rather than using a newly constructed report layout. Only the first two week rows are populated; future week rows, monthly summary and supervisor/signature fields are left blank. The Chinese file translates the headings while preserving the same table structure. The IT Plan is a content reference, not the report format. Later weeks remain a proposed schedule, not completed records.
