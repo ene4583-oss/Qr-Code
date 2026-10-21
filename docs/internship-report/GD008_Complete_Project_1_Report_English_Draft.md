@@ -38,7 +38,7 @@ Date: To be completed on actual signing
 
 ## SUMMARY
 
-This interim account covers Project 1, a QR-based stock inventory website. Weeks 1–2 focus on client requirements, technical research, workflow design and an initial prototype. Week 3 is reserved for client review and test runs, followed by retesting and maintenance in Week 4. Specific modifications remain pending client feedback. Future activities are not represented as completed outcomes.
+This interim account covers Weeks 1 and 2 of Project 1, a QR-based stock inventory website, from 12 to 24 October 2026. It describes client requirements, technical research, workflow and data design, and the initial prototype. The prototype is awaiting client review; feedback and modifications will be recorded when available. Activities after 21 October remain draft arrangements until confirmed.
 
 Keywords: inventory management; QR codes; web application; Google Apps Script; industrial training.
 
@@ -48,7 +48,7 @@ Keywords: inventory management; QR codes; web application; Google Apps Script; i
 
 Table A1: Requirements list
 
-Table A2: One-month project schedule
+Table A2: Weeks 1–2 reporting schedule
 
 Table A3: Test-run checklist
 
@@ -58,7 +58,7 @@ Appendix A: Requirements, schedule and test cases
 
 ### 1.1 Training and Project Background
 
-The industrial training placement is at Bakti Makmur (M) Sdn. Bhd., from 12 October 2026 to 9 January 2027, under Christopher Kong San Hor, IT Technician. This section covers Project 1, a QR-based stock inventory website, provisionally scheduled from 12 October to 7 November 2026. Company background details and the company logo will be added separately.
+The industrial training placement is at Bakti Makmur (M) Sdn. Bhd., from 12 October 2026 to 9 January 2027, under Christopher Kong San Hor, IT Technician. This account covers only Weeks 1–2 of Project 1, the QR-based stock inventory website. Company background details and the company logo will be added separately.
 
 The client previously used product QR codes linked to a Google Form. The project brings stock issues, receipts, employee IDs and photo evidence into a mobile-friendly website, with inventory quantities and management functions available to administrators.
 
@@ -90,14 +90,6 @@ I communicated with the client online and in person to understand how workers co
 
 The work up to 21 October focused on selecting tools, organising the product and transaction data, and preparing the initial website. The prototype brings together QR product selection, employee ID and quantity entry, photos, stock calculations and administrator functions. The remaining days of this week are allocated to checking the prototype and preparing it for the client’s review. Formal acceptance and any client-requested changes remain pending.
 
-### 3.3 Week 3: Client Review and Test Run (26–31 October — Planned)
-
-The third week is reserved for the client to review and try the website. Test runs will focus on scanning printed labels, selecting the correct product, submitting receipts/issues, checking photos and verifying inventory changes. Comments and problems will be recorded for prioritisation. Specific modifications are left open until the client provides feedback.
-
-### 3.4 Week 4: Follow-up Testing and Maintenance (2–7 November — Planned)
-
-The fourth week is allocated to further test runs, checking any changes agreed with the client and initial maintenance. Modifications will depend on the feedback received; no particular fix is claimed in advance. The actual changes, retest results and handover status will be added after confirmation.
-
 ## CHAPTER 4 — TASKS PERFORMED AND PROFESSIONAL PRACTICE
 
 ### 4.1 Core Tasks and Validation
@@ -112,7 +104,7 @@ Opening stock should be checked before operational use. Test records should be i
 
 ### 5.1 Project Status and Next Steps
 
-The research and initial prototype provide a basis for the client’s test run. The next stage is to collect feedback, identify necessary changes and maintain the website while checking its suitability for daily stock recording. Weeks 3–4 are future work in this draft dated 21 October 2026; actual feedback, modifications and acceptance will be entered later. This project account forms only the first part of the longer industrial training report.
+During Weeks 1 and 2, client discussions, requirements analysis, technical research and initial development established a prototype for the QR-based inventory website. It is now ready for client review. Actual feedback, modifications and maintenance will be documented separately when available. This account is limited to the first two weeks and forms the first part of the longer industrial training report.
 
 ## APPENDIX A — REQUIREMENTS, SCHEDULE AND TEST CASES
 
@@ -138,7 +130,7 @@ The research and initial prototype provide a basis for the client’s test run. 
 
 | R8 | Admin | Change company name/logo; restrict administrative requests server-side. |
 
-### Table A2: One-Month Project Schedule
+### Table A2: Weeks 1–2 Reporting Schedule
 
 | Week | Dates | Focus |
 
@@ -147,10 +139,6 @@ The research and initial prototype provide a basis for the client’s test run. 
 | Week 1 | 12–17 Oct 2026 | Requirements and client discussions |
 
 | Week 2 | 19–24 Oct 2026 | Research, design and initial prototype |
-
-| Week 3 — planned | 26–31 Oct 2026 | Client review, test runs and feedback; changes pending |
-
-| Week 4 — planned | 2–7 Nov 2026 | Retesting and maintenance according to client feedback |
 
 ### Table A3: Functional Test Plan
 
@@ -172,7 +160,7 @@ The research and initial prototype provide a basis for the client’s test run. 
 
 ## LOG RECORDS — ENGINEERING / SCIENCE
 
-Weeks 1 and 2 are current draft records; Weeks 3 and 4 are project plans, not completed-work or attendance certification.
+Only Weeks 1 and 2 are populated. The remaining weekly rows and monthly summary are left blank for later completion.
 
 | Week | Duties Performed / Task setting | Remarks<br>by Supervisor |
 
@@ -180,15 +168,15 @@ Weeks 1 and 2 are current draft records; Weeks 3 and 4 are project plans, not co
 
 | Week 1<br>12–17 Oct<br>2026 | Project 1: QR-Based Stock Inventory Management Website — Requirements Analysis.<br><br>Communicated with the client through online discussions and face-to-face meetings to understand the existing stock recording process and the intended use of product QR codes.<br><br>Reviewed the inventory spreadsheet, Google Form and QR-code PDF. Organised the initial requirements, including product identification, stock receipts and issues, photo evidence, administrator access and reorder thresholds.<br><br>Outlined the worker and administrator workflows and considered a mobile-friendly website as an alternative to a native application. |  |
 
-| Week 2<br>19–24 Oct | Progress up to 21 October: researched HTML, CSS, JavaScript, Apps Script, Sheets and Drive; designed data/workflows and prepared the initial website prototype.<br><br>The prototype covers product QR entry, employee ID, quantities/photos, stock calculations and admin functions. For 22–24 October, check and organise the prototype for Week 3 client testing. Formal feedback and modifications are pending. |  |
+| Week 2<br>19–24 Oct | Progress up to 21 October: researched HTML, CSS, JavaScript, Apps Script, Sheets and Drive; designed data/workflows and prepared the initial website prototype.<br><br>The prototype covers product QR entry, employee ID, quantities/photos, stock calculations and admin functions. For 22–24 October, check and organise the prototype for client review. Formal feedback and modifications are pending. |  |
 
-| Week 3<br>26–31 Oct<br>PLANNED | Planned: client review and test runs of QR routing, forms, inventory and photos. Collect comments and record issues. Specific modifications await client feedback. |  |
+|  |  |  |
 
-| Week 4<br>2–7 Nov<br>PLANNED | Planned: follow-up tests and initial maintenance. Make and verify only changes agreed with the client. Actual modifications and results will be filled after feedback. |  |
+|  |  |  |
 
-| Summary of the Month: October 2026 — interim draft as at 21 October | Summary of the Month: October 2026 — interim draft as at 21 October | Summary of the Month: October 2026 — interim draft as at 21 October |
+| Summary of the Month: October 2026 | Summary of the Month: October 2026 | Summary of the Month: October 2026 |
 
-| Requirements, research, design and an initial prototype form the first stage. Client review, test runs, agreed changes and maintenance are reserved for later weeks. Update this summary from actual feedback and work at month end. | Requirements, research, design and an initial prototype form the first stage. Client review, test runs, agreed changes and maintenance are reserved for later weeks. Update this summary from actual feedback and work at month end. | Requirements, research, design and an initial prototype form the first stage. Client review, test runs, agreed changes and maintenance are reserved for later weeks. Update this summary from actual feedback and work at month end. |
+|  |  |  |
 
 Student: Wong Sook En | Student ID: 2200498
 
