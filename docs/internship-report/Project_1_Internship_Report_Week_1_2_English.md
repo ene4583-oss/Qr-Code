@@ -88,87 +88,35 @@ Daily allocation note: this section expands the same activities as the previous 
 
 ### 3.1 Week 1: 12–18 October 2026
 
-#### 12 October 2026 (Monday) — Project introduction and review of existing records
+12 October 2026 (Monday) — Project introduction and review of existing records — I reviewed the inventory spreadsheet, existing Google Form and PDF of product QR codes and images to understand the current recording process. I identified product codes, names, units and stock figures as the main data, and outlined how a worker scans a label before recording a movement. I prepared questions about receipts versus issues, required evidence and administrator stock visibility as the basis for requirements gathering.
 
-I began by reviewing the purpose of the stock inventory project and the material supplied by the client. The inventory spreadsheet showed the main information that had to be retained, including product codes, names, units and stock figures. I also examined the existing Google Form entry route and the PDF of individual QR codes and product images. This helped me understand that the proposed website should improve an existing recording process rather than create an unrelated application.
+13 October 2026 (Tuesday) — Online client discussion and initial requirements — I discussed the intended workflow with the client online, focusing on product-form access, employee identification, quantities, photographs and optional notes. I translated general expectations such as automatic stock deduction into defined transaction and balance rules, then organised an initial requirements list. This linked the client’s operational descriptions to the proposed design; the exact discussion date remains subject to verification against the actual meeting record.
 
-The main task was to identify the starting workflow: a worker scans a product label and records a stock movement. I noted the information that would need clarification, particularly the difference between receipts and issues, the evidence required for each movement and who should see inventory quantities. The output was an initial set of discussion points for requirements gathering.
+14 October 2026 (Wednesday) — Face-to-face discussion and workflow clarification — The face-to-face discussion clarified that workers should see the product name, image and unit, while stock quantities remain administrator-only. Receipts also require administrator authorisation. I considered units such as PAIR, PCS, PACK and KG to prevent incorrect quantity interpretation, and noted that product codes must remain stable because printed QR labels use them. Meeting details and the exact date should be checked against the student’s records.
 
-#### 13 October 2026 (Tuesday) — Online client discussion and initial requirements
+15 October 2026 (Thursday) — Consolidation of the requirements list — I grouped requirements into worker, administrator and system functions: scanning, employee ID and photo entry, stock calculations, product maintenance, corrections, reorder thresholds, branding and QR-label printing. I separated essential behaviour from later enhancements, keeping additional messaging channels outside the initial scope. The result was a clearer checklist for client review, rather than a claim that every feature had been accepted or formally tested.
 
-I used online communication with the client to clarify the intended operation of the system. The discussion focused on how workers would enter a product form, what information they should provide and how stock quantities should change after submission. The key recording fields were identified as employee identification, movement quantity and a supporting photograph, with notes available when needed.
+16 October 2026 (Friday) — Research into a suitable development approach — I compared a mobile-friendly website with a native application and selected the web approach because workers can open product links through a phone camera without installation. I researched HTML, CSS and JavaScript for the interface and Google Apps Script, Sheets and Drive for processing, records and photos. I also noted internet dependence, service quotas and the need to check administrator permissions on the server.
 
-I separated statements about the desired result from decisions about implementation. For example, “stock should reduce automatically” required a defined issue transaction and a consistent balance calculation. I organised these points into a preliminary requirements list so that the client’s operational descriptions could be used as a basis for design. The exact date of this discussion should be checked against the actual meeting record.
+17 October 2026 (Saturday, work until 12 noon) — Initial workflow and data-field planning — During the Saturday half-day, ending at 12 noon, I outlined separate worker and administrator workflows and planned product and transaction fields. Product data included code, name, unit, opening balance, threshold and image; transactions included movement type, quantity, employee ID, time and photo. I defined stock as opening balance plus valid receipts minus valid issues. The precise task allocation should still be checked against actual records.
 
-#### 14 October 2026 (Wednesday) — Face-to-face discussion and workflow clarification
-
-The face-to-face discussion was used to clarify how the proposed system would fit the stock collection process. An important requirement was that workers should see the product name, image and unit after scanning, while the actual stock quantity should be visible only to administrators. Incoming stock would be recorded through an administrator-authorised operation rather than treated as an ordinary worker action.
-
-I considered the practical meaning of units such as PAIR, PCS, PACK and KG. The quantity field must use the unit assigned to the product so that a package is not accidentally recorded as an individual piece. I also noted that product codes must remain stable because printed QR labels use those identifiers. The meeting details and date remain subject to confirmation from the student’s records.
-
-#### 15 October 2026 (Thursday) — Consolidation of the requirements list
-
-I grouped the requirements into worker, administrator and system responsibilities. The worker requirements covered product-specific scanning, product information, employee ID, quantity and photo submission. Administrator requirements covered stock visibility, receipts, product maintenance, correction of mistaken records, reorder thresholds and QR-label printing. Company name and logo settings were included in the same proposed administrative scope.
-
-I also distinguished essential behaviour from later enhancements. The initial solution would use email and on-page reminders where configured; other messaging channels were outside the agreed first scope. This prevented the requirements list from expanding into unrelated functions. The result was a clearer checklist that could support client review without being mistaken for proof of acceptance or completed testing.
-
-#### 16 October 2026 (Friday) — Research into a suitable development approach
-
-I compared a mobile-friendly website with a native application. The website approach was appropriate because a phone camera could open the product link directly after scanning, with no separate installation needed. It also allowed administrators to use a computer while workers used phones. I investigated how HTML, CSS and JavaScript could provide the form and responsive interface.
-
-I researched Google Apps Script as the backend connecting Google Sheets and Google Drive. Sheets could hold product and movement records, while Drive could store photos. This choice matched the existing use of Google tools and reduced initial infrastructure work. I noted limitations such as internet dependence, service quotas and the need for server-side permission checks rather than relying on hidden interface controls.
-
-#### 17 October 2026 (Saturday, work until 12 noon) — Initial workflow and data-field planning
-
-I organised the proposed worker flow as scanning, checking product information, entering an employee ID and quantity, attaching a photo and submitting. The administrator flow covered inventory review, incoming stock, product changes and label printing. Describing the flows separately helped identify which actions required administrator permission.
-
-I outlined separate product and transaction records. A product would hold its code, name, unit, opening balance, reorder threshold and image reference. A transaction would identify the product, movement type, quantity, employee ID, time and photo reference. The balance rule was opening stock plus valid receipts minus valid issues. This provided a design basis for the initial prototype. Saturday is a half-day ending at 12 noon; the exact task allocation still requires verification against actual records.
-
-#### 18 October 2026 (Sunday) — Rest day
-
-Sunday was a rest day with no work attendance. No meetings, development work or project tasks are recorded for this date.
+18 October 2026 (Sunday) — Rest day — Sunday was a rest day with no work attendance. No meetings, development work or project tasks are recorded for this date.
 
 ### 3.2 Week 2: 19–25 October 2026
 
-#### 19 October 2026 (Monday) — Data organisation and prototype structure
+19 October 2026 (Monday) — Data organisation and prototype structure — I refined the organisation of Products, Transactions and Settings, separating product details from movements and keeping company branding in Settings. I distinguished product display images from transaction photos and arranged the worker form, administrator view and QR-label page around a shared product code. Opening stock was treated as a balance requiring physical verification, rather than a replacement for normal receipt entries.
 
-I refined the data organisation for Products, Transactions and Settings. Product details were kept separate from stock movements to make changes easier to trace. Settings would hold the company name and logo. The proposed data model also retained the distinction between a product display image and the photograph attached to an individual movement.
+20 October 2026 (Tuesday) — Initial worker interface and submission flow — I developed the initial worker form with HTML, CSS and JavaScript, including product information, employee ID, quantity and a required photo in a phone-friendly layout. I outlined input validation, product identification, receipt/issue processing and photo references, considering positive quantities, insufficient stock and duplicate requests. Employee IDs were kept as text to preserve letters and leading zeroes, without treating them as verified authentication.
 
-I organised the page structure around a worker form, an administrator inventory view and a QR-label page. The same product code would connect the stock record, form and QR label. Opening stock was treated as a starting balance that required physical verification, not a substitute for normal incoming-stock entries. The output was a clearer structure for connecting the interface and stored records.
+21 October 2026 (Wednesday) — Initial administrator functions and review preparation — I consolidated administrator requirements in the initial prototype, including inventory/history, product maintenance, reorder settings, photo updates and printable QR labels. Labels support single, multiple or all products with removal of accidental selections. I considered corrections that reverse stock once, retain the original record and reason, and reject receipt deletion that creates negative stock. The prototype was prepared for client review; acceptance and requested changes remained pending.
 
-#### 20 October 2026 (Tuesday) — Initial worker interface and submission flow
+22 October 2026 (Thursday) — Planned prototype checks and information review — Planned: check the initial prototype against the existing requirements, especially product codes, units, employee ID, quantity and photo fields, worker stock privacy and administrator authorisation for receipts. Record discrepancies or missing information before client review. No particular defect, repair or passing result is claimed in advance; replace this entry with the actual checks and outcomes after execution.
 
-I developed the initial worker-facing structure using HTML, CSS and JavaScript. The form was designed to show the selected product, accept an employee ID and quantity, and require a photo. The responsive layout was intended to remain readable on a phone, as scanning is the main way workers enter the system.
+23 October 2026 (Friday) — Planned QR-label and administrator review — Planned: review QR destinations and the label layout, including product code, name, unit, photo and optional text. Check that the selected list identifies the intended print items and that removing a selection does not delete a product. Review the already-scoped branding, product and correction controls; actual findings remain to be recorded after execution.
 
-I considered the processing steps needed after submission: validate the input, identify the product, distinguish an issue from a receipt and record the photo reference. Positive quantities, insufficient-stock rejection and duplicate-request handling were included in the design. Employee IDs were treated as text so that leading zeroes and letters could be retained, but this entry was not presented as verified identity.
+24 October 2026 (Saturday, work until 12 noon) — Planned consolidation for client review — Planned for the Saturday morning, ending at 12 noon: consolidate requirements, workflow notes and the prototype for client review, and prepare the customer requirement table with confirmation and comment fields. Keep expected behaviour consistent across documents. The intended outcome is readiness for feedback, not final acceptance; actual preparation tasks and specific client-requested modifications remain to be confirmed.
 
-#### 21 October 2026 (Wednesday) — Initial administrator functions and review preparation
-
-I brought the administrator-facing requirements together with the initial prototype. These included inventory and recent-record views, product maintenance, reorder settings, photo updates and the generation of product QR labels. Label selection needed to support one, several or all products and allow accidental selections to be removed before printing.
-
-I also considered controlled correction of mistaken stock records. A correction should reverse the stock effect once while retaining the original record and a reason. Deleting a receipt should not create a negative balance. The research, design and initial prototype were prepared for client review, but actual client acceptance and specific requested modifications were still pending. These points were recorded separately from confirmed delivery results.
-
-#### 22 October 2026 (Thursday) — Planned prototype checks and information review
-
-Planned activity: review the initial prototype against the existing requirements list, concentrating on the product code, unit, employee ID, quantity and photo fields. Check that stock quantities remain excluded from the worker view and that receipt operations require administrator authorisation.
-
-The intended output is a short list of discrepancies or missing information to resolve before the client review. No particular fault, repair or successful test is claimed in advance. The actual checks performed and their results should replace this planned entry once the work has taken place.
-
-#### 23 October 2026 (Friday) — Planned QR-label and administrator review
-
-Planned activity: review product QR links and the label layout, including the code, name, unit, available photo and optional label text. Verify that a selection list clearly identifies the products intended for printing and that removing a selection does not delete the product itself.
-
-The administrator review is intended to cover company name/logo settings, product information and record-correction controls already included in the requirements. This is preparation within the existing scope, not a new feature commitment. Actual findings, if any, remain to be recorded after execution.
-
-#### 24 October 2026 (Saturday, work until 12 noon) — Planned consolidation for client review
-
-Planned activity: consolidate the initial requirements, workflow notes and prototype so the client can review them together. Prepare the customer-facing requirement table with space to confirm a function, request a change or leave a comment. Keep the description of expected behaviour consistent with the report.
-
-The intended stage outcome is a prototype ready for feedback, not an assumed final acceptance. Detailed client-requested changes and maintenance work are not prewritten because the feedback has not yet been received. Saturday work is limited to the morning, ending at 12 noon; actual preparation tasks completed remain to be confirmed.
-
-#### 25 October 2026 (Sunday) — Rest day
-
-Under the confirmed work arrangement, Sunday is a non-working day. This date is a scheduled rest day; no work tasks, meetings, test results or modifications are recorded in advance.
+25 October 2026 (Sunday) — Rest day — Sunday is a scheduled rest day under the confirmed work arrangement. No work tasks, meetings, tests or modifications are planned or claimed for this date.
 
 ## CHAPTER 4 — TASKS PERFORMED AND PROFESSIONAL PRACTICE
 
@@ -248,9 +196,9 @@ Only Weeks 1 and 2 are populated. The remaining weekly rows and monthly summary 
 
 | --- | --- | --- |
 
-| Week 1<br>12–18 Oct | 12 Oct: project introduction and existing-material review.<br><br>13 Oct: online requirements discussion (date to verify).<br><br>14 Oct: face-to-face workflow clarification (date to verify).<br><br>15 Oct: group worker/admin/system requirements.<br><br>16 Oct: research web approach and tools.<br><br>17 Oct (morning, until 12 noon): outline workflows/data fields.<br><br>18 Oct: Sunday rest day; no work attendance. |  |
+| Week 1<br>12–18 Oct | 12 Oct: project introduction and existing-material review.<br>13 Oct: online requirements discussion (date to verify).<br>14 Oct: face-to-face workflow clarification (date to verify).<br>15 Oct: group worker/admin/system requirements.<br>16 Oct: research web approach and tools.<br>17 Oct (morning, until 12 noon): outline workflows/data fields.<br>18 Oct: Sunday rest day; no work attendance. |  |
 
-| Week 2<br>19–25 Oct | 19 Oct: refine product/transaction/settings data organisation.<br><br>20 Oct: initial worker interface and submission flow.<br><br>21 Oct: organise admin functions/prototype for client review.<br><br>22 Oct (planned): review prototype and data against requirements.<br><br>23 Oct (planned): review labels and administrator interface.<br><br>24 Oct (planned morning, until 12 noon): consolidate client review material.<br><br>25 Oct: Sunday rest day; no work scheduled. |  |
+| Week 2<br>19–25 Oct | 19 Oct: refine product/transaction/settings data organisation.<br>20 Oct: initial worker interface and submission flow.<br>21 Oct: organise admin functions/prototype for client review.<br>22 Oct (planned): review prototype and data against requirements.<br>23 Oct (planned): review labels and administrator interface.<br>24 Oct (planned morning, until 12 noon): consolidate client review material.<br>25 Oct: Sunday rest day; no work scheduled. |  |
 
 |  |  |  |
 
