@@ -26,3 +26,7 @@ These are review drafts, not signed or verified internship records. Dates, meeti
 ## GD008 format correction
 
 The Word files now retain the actual Engineering/Science WEEKLY & MONTHLY RECORDS section from the uploaded GD008 template, rather than using a newly constructed report layout. Only the first two week rows are populated; future week rows, monthly summary and supervisor/signature fields are left blank. The Chinese file translates the headings while preserving the same table structure. The IT Plan is a content reference, not the report format. Later weeks remain a proposed schedule, not completed records.
+
+## Latest: complete original template (Engineering)
+
+The Word files now use the complete GD008 template re-uploaded by the user. Only Week 1 and Week 2 in the Engineering/Science weekly/monthly record table have been filled. All original cover/company/student placeholders, chapters, sample material, future-week rows, monthly summary, signatures, QS section and assessment tables remain unchanged for the user to complete or remove as appropriate. The Chinese version changes only the two weekly entry contents; template headings stay unchanged. These are partial working documents, not submission-ready completed reports.
