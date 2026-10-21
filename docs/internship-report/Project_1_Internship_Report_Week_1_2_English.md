@@ -58,9 +58,15 @@ Appendix A: Requirements, schedule and test cases
 
 ### 1.1 Training and Project Background
 
-The industrial training placement is at Bakti Makmur (M) Sdn. Bhd., from 12 October 2026 to 9 January 2027, under Christopher Kong San Hor, IT Technician. This account covers only Weeks 1–2 of Project 1, the QR-based stock inventory website. Company background details and the company logo will be added separately.
+The industrial training placement is at Bakti Makmur (M) Sdn. Bhd. (registration no. 1316038-M), at A13, Tingkat Bawah, Lorong Seri Setali 113/1, Perumahan Seri Setali, 25300 Kuantan, Pahang. The company telephone/fax is 09-509 3745 and the company email is baktimakmurm@yahoo.com. These details are taken from the internship offer letter dated 15 September 2026. The company logo will be added separately.
 
 The client previously used product QR codes linked to a Google Form. The project brings stock issues, receipts, employee IDs and photo evidence into a mobile-friendly website, with inventory quantities and management functions available to administrators.
+
+The offered position is IT Technician in the IT Department, for the placement from 12 October 2026 to 9 January 2027. The role description includes assisting with IT infrastructure, networks, backups, user accounts, office and application support, and system improvements. These are role responsibilities, not claims that every duty has been performed during this reporting period. This account remains limited to the first two weeks of the inventory website project.
+
+The offer letter states that the intern reports to Christopher Kong San Hor, Managing Director, and Alexander Kong San Lum, Executive Director. This is the documented internship reporting relationship, not a complete company organisation chart. The IT Plan lists Christopher Kong San Hor as IT Technician, which differs from the offer letter and should be confirmed before submission. The letter does not establish the company’s principal business sector, so no industry background is invented.
+
+Normal working hours are 8 a.m.–5 p.m., Monday to Friday, with a one-hour lunch break, and 8 a.m.–12 noon on Saturday. Sunday is a non-working day as separately confirmed by the student. Individual daily tasks still require verification against actual records.
 
 ### 1.2 Objectives and Scope
 
@@ -210,7 +216,7 @@ Only Weeks 1 and 2 are populated. The remaining weekly rows and monthly summary 
 
 Student: Wong Sook En | Student ID: 2200498
 
-Industry supervisor: Christopher Kong San Hor | IT Technician
+Industry supervisor: Christopher Kong San Hor | Managing Director (offer letter; the IT Plan lists IT Technician—confirm before submission)
 
 Student signature: ____________________
 

@@ -18,3 +18,7 @@ Earlier filenames are aliases to the newest daily report versions. The customer 
 ## Compact daily layout
 
 Each date is now one concise paragraph, with a bold inline date instead of a separate daily heading. Weekly/chapter headings, A4 and Times New Roman 12 with 1.5-line body spacing are retained. The table of contents covers chapters and sections only. Saturday half-days, Sunday rest days and future-date status remain unchanged. This reduces length without claiming a verified final page count; update the Word TOC and inspect the full report pagination before submission.
+
+## Company details from the offer letter
+
+Company registration number, address, business contact, IT department, offered role, reporting relationship and normal hours have been added from the supplied offer letter. The source letter, national ID, home address and remuneration were not uploaded. Christopher Kong San Hor is Managing Director in the letter but IT Technician in the IT Plan; this discrepancy is explicitly flagged for confirmation. The company business sector and full organisation chart remain unverified. Company logo is still blank.

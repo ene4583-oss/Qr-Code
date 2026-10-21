@@ -52,9 +52,15 @@ October 2026 Trimester
 
 ### 1.1 实习与项目背景
 
-实习单位为 Bakti Makmur (M) Sdn. Bhd.，实习期为 2026 年 10 月 12 日至 2027 年 1 月 9 日，企业主管为 Christopher Kong San Hor，职位 IT Technician。本部分只记录第一个项目——二维码库存管理网站的第一、二周。公司背景资料及 Logo 之后补充。
+实习单位为 Bakti Makmur (M) Sdn. Bhd.，注册编号 1316038-M，地址为 A13, Tingkat Bawah, Lorong Seri Setali 113/1, Perumahan Seri Setali, 25300 Kuantan, Pahang。公司电话／传真为 09-509 3745，电邮为 baktimakmurm@yahoo.com。上述资料来自 2026 年 9 月 15 日的实习录取信，公司 Logo 之后另加。
 
 客户原本使用商品二维码连接 Google Form。项目将领货、进货、员工 ID 与照片凭证整合到手机友好的网站，并由管理员查看库存数量及执行管理操作。
+
+录取信提供的职位为 IT Technician，部门为 IT Department，实习期间为 2026 年 10 月 12 日至 2027 年 1 月 9 日。职责说明包括协助 IT 基础设施、网络、备份、用户账号、办公与应用系统支持，并参与系统改善；这些是岗位范围，不表示本阶段已执行所有职责。本报告仍只记录前两周的库存网站项目。
+
+录取信说明实习生向 Managing Director Christopher Kong San Hor 及 Executive Director Alexander Kong San Lum 汇报。这是已知的实习汇报关系，不是完整公司组织架构。IT Plan 将 Christopher Kong San Hor 的职位列为 IT Technician，与录取信不同，正式提交前须确认。录取信未说明公司的主要业务性质，因此不自行编造行业背景。
+
+正常工作时间为星期一至五上午 8 点至下午 5 点，含一小时午休；星期六上午 8 点至中午 12 点。星期日不上班，依据学生另外确认的安排。具体每日任务仍按实际记录核对。
 
 ### 1.2 目标与范围
 
@@ -204,7 +210,7 @@ October 2026 Trimester
 
 学生：Wong Sook En｜学号：2200498
 
-主管：Christopher Kong San Hor｜IT Technician
+主管：Christopher Kong San Hor｜Managing Director（录取信；IT Plan 列为 IT Technician，提交前须确认）
 
 学生签名：____________________
 
