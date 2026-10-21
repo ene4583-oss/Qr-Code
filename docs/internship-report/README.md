@@ -1,32 +1,23 @@
-# Project 1 — Internship Report Drafts
+# GD008 Industrial Training Report — Engineering Drafts
 
-Reporting period: 12–24 October 2026 (Weeks 1 and 2).
+The latest reports contain a filled cover, declaration draft, summary, Word table-of-contents field, five chapters, references, appendices, Engineering weekly/monthly records and the original official assessment tables. Facts about the student, company, supervisor and training dates are taken from the supplied IT Plan. The company logo is left blank.
 
-Proposed project duration: 12 October–7 November 2026 (approximately one month).
+## Download Word
 
-| Week | Dates | Focus |
-| --- | --- | --- |
-| 1 | 12–17 October | Client discussions and requirements analysis |
-| 2 | 19–24 October | Technical research, workflow/data design and wireframes |
-| 3 | 26–31 October | Core implementation and integration (planned) |
-| 4 | 2–7 November | Feature refinement, testing, client feedback and handover (planned) |
+- [English complete report draft](GD008_Complete_Project_1_Report_English_Draft.docx)
+- [中文完整报告草稿](GD008_Complete_Project_1_Report_Chinese_Draft.docx)
 
-## English
+Open a Word file and choose **Download raw file**. In Microsoft Word, right-click the table of contents and update the entire field; review pagination before submission.
 
-- [Word document](Project_1_Internship_Report_Week_1_2_English.docx) — open the file and choose **Download raw file**.
-- [Read online / copy text](Project_1_Internship_Report_Week_1_2_English.md)
+## Read online
 
-## 中文版
+- [English](GD008_Complete_Project_1_Report_English_Draft.md)
+- [中文](GD008_Complete_Project_1_Report_Chinese_Draft.md)
 
-- [Word 文件](Project_1_Internship_Report_Week_1_2_Chinese.docx) — 打开后点击 **Download raw file** 下载。
-- [在线阅读／复制文字](Project_1_Internship_Report_Week_1_2_Chinese.md)
+## Scope and outstanding facts
 
-These are review drafts, not signed or verified internship records. Dates, meeting details and completed activities must be checked against actual work. Activities from 22 October onward were planned when these drafts were prepared. Supervisor remarks remain blank.
+These are filled **interim Project 1 drafts**, not a certified final report for the complete placement. The training plan runs from 12 October 2026 to 9 January 2027; Project 1 is provisionally scheduled for 12 October–7 November 2026. Weeks 3–4 and activities from 22 October are marked as plans. Test cases are plans, not invented execution results. The main draft is shorter than the final guideline's 6,000–8,000-word target, which requires later actual training experience and evidence.
 
-## GD008 format correction
+The supplied IT Plan does not contain the company's full address, business profile or complete organisation chart. These are identified as outstanding rather than fabricated. Student/supervisor signatures, company stamp and assessor scores remain for the authorised people. The student must check declaration wording, factual accuracy and university requirements on assisted writing before submission.
 
-The Word files now retain the actual Engineering/Science WEEKLY & MONTHLY RECORDS section from the uploaded GD008 template, rather than using a newly constructed report layout. Only the first two week rows are populated; future week rows, monthly summary and supervisor/signature fields are left blank. The Chinese file translates the headings while preserving the same table structure. The IT Plan is a content reference, not the report format. Later weeks remain a proposed schedule, not completed records.
-
-## Latest: complete original template (Engineering)
-
-The Word files now use the complete GD008 template re-uploaded by the user. Only Week 1 and Week 2 in the Engineering/Science weekly/monthly record table have been filled. All original cover/company/student placeholders, chapters, sample material, future-week rows, monthly summary, signatures, QS section and assessment tables remain unchanged for the user to complete or remove as appropriate. The Chinese version changes only the two weekly entry contents; template headings stay unchanged. These are partial working documents, not submission-ready completed reports.
+Earlier filenames remain available as aliases to the latest complete drafts.
