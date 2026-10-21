@@ -40,8 +40,6 @@ Date: To be completed on actual signing
 
 This interim account covers 12–25 October 2026, the first two reporting weeks of Project 1: a QR-based stock inventory website. It expands the same client requirements, research, workflow/data design and initial-prototype content into daily entries. The prototype is awaiting client review. Exact daily allocations require verification; dates after 21 October remain planned. Later feedback, modifications and maintenance are not included as completed activities.
 
-Keywords: inventory management; QR codes; web application; Google Apps Script; industrial training.
-
 ## TABLE OF CONTENTS
 
 ## LIST OF TABLES AND APPENDICES
@@ -58,7 +56,7 @@ Appendix A: Requirements, schedule and test cases
 
 ### 1.1 Training and Project Background
 
-The industrial training placement is at Bakti Makmur (M) Sdn. Bhd. (registration no. 1316038-M), at A13, Tingkat Bawah, Lorong Seri Setali 113/1, Perumahan Seri Setali, 25300 Kuantan, Pahang. The company telephone/fax is 09-509 3745 and the company email is baktimakmurm@yahoo.com. These details are taken from the internship offer letter dated 15 September 2026. The company logo will be added separately.
+The industrial training placement is at Bakti Makmur (M) Sdn. Bhd. (registration no. 1316038-M), at A13, Tingkat Bawah, Lorong Seri Setali 113/1, Perumahan Seri Setali, 25300 Kuantan, Pahang. The company telephone/fax is 09-509 3745 and the company email is baktimakmurm@yahoo.com. These details are taken from the internship offer letter dated 15 September 2026. The company logo will be added separately. (Bakti Makmur (M) Sdn. Bhd., 2026).
 
 The client previously used product QR codes linked to a Google Form. The project brings stock issues, receipts, employee IDs and photo evidence into a mobile-friendly website, with inventory quantities and management functions available to administrators.
 
@@ -67,6 +65,18 @@ The offered position is IT Technician in the IT Department, for the placement fr
 The offer letter states that the intern reports to Christopher Kong San Hor, Managing Director, and Alexander Kong San Lum, Executive Director. This is the documented internship reporting relationship, not a complete company organisation chart. The IT Plan lists Christopher Kong San Hor as IT Technician, which differs from the offer letter and should be confirmed before submission. The letter does not establish the company’s principal business sector, so no industry background is invented.
 
 Normal working hours are 8 a.m.–5 p.m., Monday to Friday, with a one-hour lunch break, and 8 a.m.–12 noon on Saturday. Sunday is a non-working day as separately confirmed by the student. Individual daily tasks still require verification against actual records.
+
+Figure 1.1: Internship reporting relationship documented in the offer letter (not a complete company organisation chart)
+
+| Christopher Kong San Hor<br>Managing Director | Alexander Kong San Lum<br>Executive Director |
+
+| --- | --- |
+
+| ↓ | ↓ |
+
+| Wong Sook En<br>IT Technician Intern | Wong Sook En<br>IT Technician Intern |
+
+The full company organisation chart and principal business still require company confirmation; the supervisor-title discrepancy with the IT Plan also remains to be resolved.
 
 ### 1.2 Objectives and Scope
 
@@ -141,6 +151,20 @@ The main difficulty in this stage was translating everyday descriptions into pre
 ### 5.1 Project Status and Next Steps
 
 During Weeks 1 and 2, client discussions, requirements analysis, technical research and initial development established a prototype for the QR-based inventory website. It is now ready for client review. Actual feedback, modifications and maintenance will be documented separately when available. This account is limited to the first two weeks and forms the first part of the longer industrial training report.
+
+## REFERENCES
+
+Bakti Makmur (M) Sdn. Bhd. (2026) Internship offer letter to Wong Sook En, 15 September. Unpublished document; company details only.
+
+Universiti Tunku Abdul Rahman (2026) Industrial Training Plan: Wong Sook En, FM-FES-ITC-004, revision 4, 13 October. Unpublished training document.
+
+Universiti Tunku Abdul Rahman (2024a) Industrial Training Report Guidelines (Engineering, Architecture and Science), GD-FES-ITC-007, revision 6, effective 1 April.
+
+Universiti Tunku Abdul Rahman (2024b) GD008 IT Report Template 2024. Report template.
+
+Google (n.d.) Apps Script documentation. Available at: https://developers.google.com/apps-script/.
+
+MDN Web Docs (n.d.) Web technology documentation: HTML, CSS and JavaScript. Available at: https://developer.mozilla.org/.
 
 ## APPENDIX A — REQUIREMENTS, SCHEDULE AND TEST CASES
 

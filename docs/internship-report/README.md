@@ -22,3 +22,7 @@ Each date is now one concise paragraph, with a bold inline date instead of a sep
 ## Company details from the offer letter
 
 Company registration number, address, business contact, IT department, offered role, reporting relationship and normal hours have been added from the supplied offer letter. The source letter, national ID, home address and remuneration were not uploaded. Christopher Kong San Hor is Managing Director in the letter but IT Technician in the IT Plan; this discrepancy is explicitly flagged for confirmation. The company business sector and full organisation chart remain unverified. Company logo is still blank.
+
+## Latest guideline alignment
+
+Following the latest request to use GD007 rev06, References have been restored, the Summary is one paragraph, A4/body typography and indentation have been applied, and a clearly labelled partial internship reporting diagram has been added from known company facts. See [GD007 checklist](GD007_Format_Checklist.md) for exact length/content requirements and remaining gaps. The full company organisation chart and final whole-placement content are still outstanding. Daily entries stay one paragraph; no future client feedback is invented. Earlier notes about removing References are superseded by this update.

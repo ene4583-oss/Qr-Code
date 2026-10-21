@@ -34,8 +34,6 @@ October 2026 Trimester
 
 本阶段报告涵盖 2026 年 10 月 12–25 日，即第一个项目——二维码库存管理网站的前两个报告周。将上一版相同的需求、研究、流程与数据设计及初步原型内容扩写为逐日记录。原型待客户检视；具体每日分配须核实，21 日之后仍属计划，不将后续反馈、修改与维护写为已完成工作。
 
-关键词：库存管理；二维码；网页应用；Google Apps Script；实习。
-
 ## 目录
 
 ## 表格与附录清单
@@ -52,7 +50,7 @@ October 2026 Trimester
 
 ### 1.1 实习与项目背景
 
-实习单位为 Bakti Makmur (M) Sdn. Bhd.，注册编号 1316038-M，地址为 A13, Tingkat Bawah, Lorong Seri Setali 113/1, Perumahan Seri Setali, 25300 Kuantan, Pahang。公司电话／传真为 09-509 3745，电邮为 baktimakmurm@yahoo.com。上述资料来自 2026 年 9 月 15 日的实习录取信，公司 Logo 之后另加。
+实习单位为 Bakti Makmur (M) Sdn. Bhd.，注册编号 1316038-M，地址为 A13, Tingkat Bawah, Lorong Seri Setali 113/1, Perumahan Seri Setali, 25300 Kuantan, Pahang。公司电话／传真为 09-509 3745，电邮为 baktimakmurm@yahoo.com。上述资料来自 2026 年 9 月 15 日的实习录取信，公司 Logo 之后另加。（Bakti Makmur (M) Sdn. Bhd., 2026）
 
 客户原本使用商品二维码连接 Google Form。项目将领货、进货、员工 ID 与照片凭证整合到手机友好的网站，并由管理员查看库存数量及执行管理操作。
 
@@ -61,6 +59,18 @@ October 2026 Trimester
 录取信说明实习生向 Managing Director Christopher Kong San Hor 及 Executive Director Alexander Kong San Lum 汇报。这是已知的实习汇报关系，不是完整公司组织架构。IT Plan 将 Christopher Kong San Hor 的职位列为 IT Technician，与录取信不同，正式提交前须确认。录取信未说明公司的主要业务性质，因此不自行编造行业背景。
 
 正常工作时间为星期一至五上午 8 点至下午 5 点，含一小时午休；星期六上午 8 点至中午 12 点。星期日不上班，依据学生另外确认的安排。具体每日任务仍按实际记录核对。
+
+图 1.1：录取信列明的实习汇报关系（非完整公司组织架构）
+
+| Christopher Kong San Hor<br>Managing Director | Alexander Kong San Lum<br>Executive Director |
+
+| --- | --- |
+
+| ↓ | ↓ |
+
+| Wong Sook En<br>IT Technician 实习生 | Wong Sook En<br>IT Technician 实习生 |
+
+完整公司组织架构及主要业务仍需公司确认；主管职位与 IT Plan 的差异也待核实。
 
 ### 1.2 目标与范围
 
@@ -135,6 +145,20 @@ October 2026 Trimester
 ### 5.1 当前状态与后续工作
 
 第一、二周通过客户沟通、需求分析、技术研究与初步开发，建立了二维码库存网站的原型，目前待客户检视。实际反馈、修改与维护将在取得资料后另外记录。本部分仅涵盖前两周，作为较长实习报告的开端。
+
+## 参考资料
+
+Bakti Makmur (M) Sdn. Bhd. (2026) Internship offer letter to Wong Sook En, 15 September. Unpublished document; company details only.
+
+Universiti Tunku Abdul Rahman (2026) Industrial Training Plan: Wong Sook En, FM-FES-ITC-004, revision 4, 13 October. Unpublished training document.
+
+Universiti Tunku Abdul Rahman (2024a) Industrial Training Report Guidelines (Engineering, Architecture and Science), GD-FES-ITC-007, revision 6, effective 1 April.
+
+Universiti Tunku Abdul Rahman (2024b) GD008 IT Report Template 2024. Report template.
+
+Google (n.d.) Apps Script documentation. Available at: https://developers.google.com/apps-script/.
+
+MDN Web Docs (n.d.) Web technology documentation: HTML, CSS and JavaScript. Available at: https://developer.mozilla.org/.
 
 ## 附录 A——需求、计划及测试案例
 
