@@ -84,7 +84,7 @@ Following the research and development work, an initial prototype is available f
 
 ## CHAPTER 3 — INDUSTRIAL TRAINING WORKING EXPERIENCE
 
-Daily allocation note: this section expands the same activities as the previous draft and provisionally assigns them to dates; it is not a verified daily attendance log. Check the actual dates for 12–21 October. Entries for 22–25 October are future arrangements. Online and face-to-face discussions are part of the original account, but their exact dates were not supplied. Sunday work is unconfirmed. Later client feedback, modifications and maintenance are not prewritten.
+Daily allocation note: this section expands the same activities as the previous draft and provisionally assigns them to dates; it is not a verified daily attendance log. Check the actual dates for 12–21 October. Entries for 22–25 October are future arrangements. Online and face-to-face discussions are part of the original account, but their exact dates were not supplied. Saturdays are half-days ending at 12 noon; Sundays are non-working days. Later client feedback, modifications and maintenance are not prewritten.
 
 ### 3.1 Week 1: 12–18 October 2026
 
@@ -118,15 +118,15 @@ I compared a mobile-friendly website with a native application. The website appr
 
 I researched Google Apps Script as the backend connecting Google Sheets and Google Drive. Sheets could hold product and movement records, while Drive could store photos. This choice matched the existing use of Google tools and reduced initial infrastructure work. I noted limitations such as internet dependence, service quotas and the need for server-side permission checks rather than relying on hidden interface controls.
 
-#### 17 October 2026 (Saturday) — Initial workflow and data-field planning
+#### 17 October 2026 (Saturday, work until 12 noon) — Initial workflow and data-field planning
 
 I organised the proposed worker flow as scanning, checking product information, entering an employee ID and quantity, attaching a photo and submitting. The administrator flow covered inventory review, incoming stock, product changes and label printing. Describing the flows separately helped identify which actions required administrator permission.
 
-I outlined separate product and transaction records. A product would hold its code, name, unit, opening balance, reorder threshold and image reference. A transaction would identify the product, movement type, quantity, employee ID, time and photo reference. The balance rule was opening stock plus valid receipts minus valid issues. This provided a design basis for the initial prototype. The allocation of work to Saturday should be verified against actual attendance.
+I outlined separate product and transaction records. A product would hold its code, name, unit, opening balance, reorder threshold and image reference. A transaction would identify the product, movement type, quantity, employee ID, time and photo reference. The balance rule was opening stock plus valid receipts minus valid issues. This provided a design basis for the initial prototype. Saturday is a half-day ending at 12 noon; the exact task allocation still requires verification against actual records.
 
-#### 18 October 2026 (Sunday) — Activity record not confirmed
+#### 18 October 2026 (Sunday) — Rest day
 
-No confirmed work or attendance information has been supplied for this Sunday. No meeting, development task or working hours are claimed for this date. If the day was a rest day, it should be recorded accordingly; if project work took place, the actual task and outcome should be entered before submission.
+Sunday was a rest day with no work attendance. No meetings, development work or project tasks are recorded for this date.
 
 ### 3.2 Week 2: 19–25 October 2026
 
@@ -160,15 +160,15 @@ Planned activity: review product QR links and the label layout, including the co
 
 The administrator review is intended to cover company name/logo settings, product information and record-correction controls already included in the requirements. This is preparation within the existing scope, not a new feature commitment. Actual findings, if any, remain to be recorded after execution.
 
-#### 24 October 2026 (Saturday) — Planned consolidation for client review
+#### 24 October 2026 (Saturday, work until 12 noon) — Planned consolidation for client review
 
 Planned activity: consolidate the initial requirements, workflow notes and prototype so the client can review them together. Prepare the customer-facing requirement table with space to confirm a function, request a change or leave a comment. Keep the description of expected behaviour consistent with the report.
 
-The intended stage outcome is a prototype ready for feedback, not an assumed final acceptance. Detailed client-requested changes and maintenance work are not prewritten because the feedback has not yet been received. Whether this Saturday was a working day and which preparation tasks were actually completed must be confirmed.
+The intended stage outcome is a prototype ready for feedback, not an assumed final acceptance. Detailed client-requested changes and maintenance work are not prewritten because the feedback has not yet been received. Saturday work is limited to the morning, ending at 12 noon; actual preparation tasks completed remain to be confirmed.
 
-#### 25 October 2026 (Sunday) — Activity arrangement to be confirmed
+#### 25 October 2026 (Sunday) — Rest day
 
-This Sunday is included to cover the requested reporting period of 12–25 October, but no work schedule or activity is assumed. It is also a future date relative to this draft. Leave it as a rest day if that is the actual arrangement, or add verified project work later. No completed customer review, test result, modification or maintenance task is claimed for this date.
+Under the confirmed work arrangement, Sunday is a non-working day. This date is a scheduled rest day; no work tasks, meetings, test results or modifications are recorded in advance.
 
 ## CHAPTER 4 — TASKS PERFORMED AND PROFESSIONAL PRACTICE
 
@@ -248,9 +248,9 @@ Only Weeks 1 and 2 are populated. The remaining weekly rows and monthly summary 
 
 | --- | --- | --- |
 
-| Week 1<br>12–18 Oct | 12 Oct: project introduction and existing-material review.<br><br>13 Oct: online requirements discussion (date to verify).<br><br>14 Oct: face-to-face workflow clarification (date to verify).<br><br>15 Oct: group worker/admin/system requirements.<br><br>16 Oct: research web approach and tools.<br><br>17 Oct: outline workflows/data fields (working date to verify).<br><br>18 Oct: Sunday activity arrangement unconfirmed. |  |
+| Week 1<br>12–18 Oct | 12 Oct: project introduction and existing-material review.<br><br>13 Oct: online requirements discussion (date to verify).<br><br>14 Oct: face-to-face workflow clarification (date to verify).<br><br>15 Oct: group worker/admin/system requirements.<br><br>16 Oct: research web approach and tools.<br><br>17 Oct (morning, until 12 noon): outline workflows/data fields.<br><br>18 Oct: Sunday rest day; no work attendance. |  |
 
-| Week 2<br>19–25 Oct | 19 Oct: refine product/transaction/settings data organisation.<br><br>20 Oct: initial worker interface and submission flow.<br><br>21 Oct: organise admin functions/prototype for client review.<br><br>22 Oct (planned): review prototype and data against requirements.<br><br>23 Oct (planned): review labels and administrator interface.<br><br>24 Oct (planned): consolidate client review material.<br><br>25 Oct: Sunday activity arrangement unconfirmed. |  |
+| Week 2<br>19–25 Oct | 19 Oct: refine product/transaction/settings data organisation.<br><br>20 Oct: initial worker interface and submission flow.<br><br>21 Oct: organise admin functions/prototype for client review.<br><br>22 Oct (planned): review prototype and data against requirements.<br><br>23 Oct (planned): review labels and administrator interface.<br><br>24 Oct (planned morning, until 12 noon): consolidate client review material.<br><br>25 Oct: Sunday rest day; no work scheduled. |  |
 
 |  |  |  |
 
