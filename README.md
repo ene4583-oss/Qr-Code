@@ -153,3 +153,12 @@ Automated checks cover default branding, administrator access checks, invalid lo
 ## Dropdown picker with removable selected products
 
 The print picker now opens as a dropdown with searchable checkboxes. A separate **Selected products** list below it remains visible when the dropdown is closed. Use each row's **×** button to remove only that product from the print selection; this does not delete the product. The checkbox state and selection counter update together, and generated labels are cleared after selection changes. Selection initially starts empty; Select all/Clear selection remain available and apply to the full catalog, including search-hidden products. Generate labels then Print / Save PDF as before. Update only Index.html for this interface change. Browser checks cover searching, checkbox/list synchronization, removing an accidental selection and printing only the remaining products.
+
+
+## Illustrated reorder emails and required stock-out purpose
+
+Reorder emails now include the product code/name, current stock and unit, threshold, and a clear replenishment request. Product display photos are attached inline where readable (uploaded product images, HTTPS image links, or the supplied DU01–DU16 defaults). Worker transaction photos are never attached. Missing/unreadable product images do not stop the text alert; image lookup failures are logged. Mail clients may still control image rendering. Threshold-crossing and ordered-status rules stay unchanged.
+
+**Purpose / Notes is required for Stock out**, including a server-side whitespace check. Stock in notes remain optional. Existing records are unchanged.
+
+Upgrade both Code.gs and Index.html. HTTPS product image retrieval uses UrlFetchApp and may require an additional Google permission: run setup from the editor as the owning account and grant any new permissions, without clearing sheets or properties. Then test the saved code and update the existing deployment to a new version. No database reimport or QR replacement is needed. Validate actual email delivery and rendering in the owner's Gmail after deployment; local tests verify the email payload with mocked Google services.

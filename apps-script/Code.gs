@@ -57,6 +57,7 @@ function submitMovement(data) {
     if (!isFinite(qty)||qty<=0||qty>1000000||Math.abs(Math.round(qty*1000)-qty*1000)>0.000001) throw new Error('Quantity must be positive, with at most three decimal places.');
     if (['IN','OUT'].indexOf(data.type)<0) throw new Error('Invalid movement type');
     if (!String(data.employee||'').trim()||String(data.employee).length>100||String(data.note||'').length>1000) throw new Error('Enter an employee ID. Notes must not exceed 1,000 characters.');
+    if (data.type==='OUT'&&!String(data.note||'').trim()) throw new Error('Purpose is required for stock out.');
     if (data.type==='IN') verifyAdmin_(data.adminPassword);
     var p=products_().filter(function(x){return x.code===data.code;})[0];
     if (!p||inactive_(p)) throw new Error('Product not found or inactive');
@@ -71,11 +72,11 @@ function submitMovement(data) {
     var file=DriveApp.getFolderById(folderId).createFile(Utilities.newBlob(bytes,match[1],data.requestId+'.'+ext));
     try { db_().getSheetByName('Transactions').appendRow([data.requestId,new Date(),p.code,data.type,qty,safe_(data.employee),safe_(data.note),file.getUrl()]); SpreadsheetApp.flush(); }
     catch(e) { file.setTrashed(true);throw e; }
-    var next=p.stock+(data.type==='IN'?qty:-qty);
+    var next=Math.round((p.stock+(data.type==='IN'?qty:-qty))*1000)/1000;
     if(data.type==='IN'&&next>p.threshold) setOrdered_(p.code,false);
     // A mail failure must not turn a committed transaction into a failed response.
     if(data.type==='OUT'&&p.stock>p.threshold&&next<=p.threshold&&!p.ordered) {
-      try { var email=PropertiesService.getScriptProperties().getProperty('ADMIN_EMAIL');if(email) MailApp.sendEmail(email,'Reorder alert: '+p.code+' '+p.name,'Current stock: '+next+' '+p.unit+'; threshold: '+p.threshold+'. Sign in to the admin page to arrange a reorder.'); }
+      try { var email=PropertiesService.getScriptProperties().getProperty('ADMIN_EMAIL');if(email) sendReorderEmail_(email,p,next); }
       catch(e) { console.error('Low-stock mail failed: '+e.message); }
     }
     return {ok:true,message:'Successfully recorded '+(data.type==='IN'?'Stock in':'Stock out')+' '+qty+' '+p.unit+'.'};
@@ -228,4 +229,34 @@ function saveBranding(password,data) {
     [['companyName',name],['companyLogo',logo]].forEach(function(pair){var row=0;for(var i=1;i<rows.length;i++)if(rows[i][0]===pair[0]){row=i+1;break;}if(row)s.getRange(row,2).setValue(pair[1]);else s.appendRow(pair);});
     SpreadsheetApp.flush();return {companyName:name,logoData:logo};
   } finally {lock.releaseLock();}
+}
+
+
+function emailHtml_(value){return String(value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function reorderPhoto_(product) {
+  // Only product display photos are attached, never worker transaction photos.
+  try {
+    var url=catalogImage_(product.imageUrl),match=String(url||'').match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+    if(match){var bytes=Utilities.base64Decode(match[2]);if(bytes.length<=2*1024*1024)return Utilities.newBlob(bytes,match[1],'product-photo');return null;}
+    if(!url&&/^DU(0[1-9]|1[0-6])$/.test(product.code))url='https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/'+product.code+'.jpg';
+    if(!/^https:\/\//.test(url||''))return null;
+    var response=UrlFetchApp.fetch(url,{muteHttpExceptions:true});
+    if(response.getResponseCode()!==200)return null;
+    var blob=response.getBlob();
+    if(['image/jpeg','image/png','image/webp'].indexOf(blob.getContentType().split(';')[0])<0||blob.getBytes().length>2*1024*1024)return null;
+    return blob;
+  } catch(e) {console.error('Reorder image unavailable: '+e.message);return null;}
+}
+function sendReorderEmail_(email,product,stock) {
+  var esc=emailHtml_,status=stock<=0?'Out of stock — please reorder':'Low stock — please reorder',photo=reorderPhoto_(product),link='';
+  try{link=getDeploymentUrl();}catch(e){}
+  var plain=product.code+' — '+product.name+'\n'+status+'\nCurrent stock: '+stock+' '+product.unit+'\nReorder threshold: '+product.threshold+' '+product.unit+'\nPlease arrange replenishment and mark the product as ordered in the administrator page.';
+  var html='<div style="font-family:Arial,sans-serif;max-width:560px;color:#173d31"><h2 style="color:#a85616">'+esc(status)+'</h2><h3>'+esc(product.code)+' — '+esc(product.name)+'</h3>'+
+    (photo?'<img src="cid:productPhoto" alt="'+esc(product.name)+'" width="240" style="max-width:100%;height:auto;object-fit:contain">':'<p style="color:#777">Product photo unavailable</p>')+
+    '<table style="border-collapse:collapse;margin:20px 0"><tr><td style="padding:10px;border:1px solid #ddd">Current stock</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold">'+esc(stock)+' '+esc(product.unit)+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd">Reorder threshold</td><td style="padding:10px;border:1px solid #ddd">'+esc(product.threshold)+' '+esc(product.unit)+'</td></tr></table><p>Please arrange replenishment. Once ordered, mark this product as ordered in the administrator page.</p>';
+  if(/^https:\/\/script\.google\.com\//.test(link)){html+='<p><a href="'+esc(link)+'" style="color:#176653">Open inventory website</a></p>';plain+='\n'+link;}
+  html+='</div>';
+  var message={to:email,subject:'Reorder alert: '+product.code+' '+product.name,body:plain,htmlBody:html};
+  if(photo)message.inlineImages={productPhoto:photo};
+  MailApp.sendEmail(message);
 }
