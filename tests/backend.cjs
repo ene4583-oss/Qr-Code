@@ -105,3 +105,6 @@ context.submitMovement(receipt);assert.equal(context.getAdmin('secret').products
 context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:'',enabled:a.id==='F1'?false:a.enabled})));
 assert.throws(()=>context.submitMovement({...receipt,requestId:'disabled_receipt_001'}),/Incorrect foreman/);
 console.log('PASS foreman receipts: six private password slots, admin-only configuration, password preservation, independent credentials, disabled account, live-camera metadata/freshness, audit fields, no password leakage, idempotent stock addition.');
+context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:a.id==='F2'?'OnlyLettersAllowed':'',enabled:a.id==='F2'})));
+assert.equal(context.verifyForeman_('F2','OnlyLettersAllowed').id,'F2');
+console.log('PASS letters-only foreman password accepted; no numeric-character requirement.');

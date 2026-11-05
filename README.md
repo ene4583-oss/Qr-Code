@@ -197,3 +197,9 @@ Administrator metrics, inventory/history rows and alert dialogs now use DOM cons
 The worker form's native Choose files button is replaced by a custom **Upload face photo** control. For stock in the similarly labelled action still opens the live camera; gallery upload is not added. Stock out retains its original picker/camera behavior. Image presence is validated by the form submission handler and backend, avoiding a hidden required file field that cannot receive focus.
 
 Local tests cover full inventory workflows, front/rear camera selection and an additional sandboxed iframe using document.write. Run `node tests/html-write-browser.cjs` for the latter. Actual Google-hosted initialization and camera permissions still require a live /dev check. No inventory reset, new deployment URL or data reimport is required.
+
+### Password visibility and alphabetic passwords
+
+Foreman passwords may contain letters only; there is no required numeric character. The existing 8–128-character foreman length rule remains. Administrator passwords continue to use the existing Script Property setting.
+
+Administrator login, foreman stock-in login and all six foreman password-setting fields now have an accessible eye button to show/hide the entered value. They default to masked, and navigation/mode changes hide visible password fields again. An existing saved password is never sent back to the browser; the eye only reveals what the user has typed. This interface change only requires Index.html to be updated if the latest foreman backend is already installed.
