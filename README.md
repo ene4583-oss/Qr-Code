@@ -243,3 +243,32 @@ Staff accounts now has only **Account, Status, Action** columns. There is no Typ
 Movement forms use Account and Password; the Stock in/Stock out tabs identify the operation, so workers no longer choose Foreman/Staff. The backend checks the authenticated account's explicit permissions on every new movement. Existing Foreman accounts inherit IN+OUT, old Staff accounts inherit OUT, and disabled accounts inherit no access. This preserves existing access without auto-granting new permissions. Passwords, stable IDs and transaction history remain intact. Legacy type metadata may remain in stored records for backward compatibility, but is not a user-facing field or the authority once permissions are set.
 
 Replace both Code.gs and Index.html and test /dev before updating the same production deployment. The new permission rules only apply to the new code version; an older deployed version does not understand explicit permissions. Do not test access restrictions against an older production deployment after changing permissions. No sheet reimport or QR change is required. Local tests cover IN-only, OUT-only, both, no access, revocation, legacy mapping, status display, administrator re-confirmation and the normal inventory workflows.
+
+## Direct live camera on phones and computers — independent HTTPS page
+
+The camera no longer requests webcam access inside the Apps Script iframe. **Upload face photo** opens `camera.html` as a separate top-level page; it starts the camera immediately and shows only a shutter, a front/rear flip icon, and close. There is no file input, photo-library picker or native-upload fallback. This avoids an iframe camera-permission block without pretending that browser permission prompts can be bypassed. A phone browser or computer with a working webcam must still grant camera permission. This is live camera capture, not face recognition or certified liveness.
+
+The inventory form remains on the existing Google /exec deployment. The static camera page uses HTTPS hosting at:
+
+`https://ene4583-oss.github.io/Qr-Code/camera.html`
+
+### Enable the camera host once
+
+1. In this GitHub repository, open **Settings → Pages**.
+2. Under Build and deployment, choose **Deploy from a branch**.
+3. Select **main** and **/(root)**, then **Save**.
+4. Wait for the Pages deployment to succeed. `.nojekyll` keeps the static files unchanged.
+5. Open the camera URL directly to confirm it is hosted; without an inventory opener it should say to open it from Upload face photo. Do not use the GitHub Pages index as the production inventory database: that is the local-demo page.
+6. Update **Index.html only** in Apps Script, save, and test /dev on the intended phones before updating the existing production deployment. The current staff-permission Code.gs remains unchanged. Do not create a new /exec URL or reimport sheets.
+
+The camera and inventory tabs must remain in the same browser. Allow pop-ups for the inventory website. On Android use Chrome; on iPhone use Safari; avoid an embedded messaging-app browser. If a phone opens a separate browser that drops the opener connection, the camera will refuse to return a photo instead of sending it elsewhere. Actual Google-hosted opener behavior and phone permissions must be verified; local tests do not certify the live deployment.
+
+### Photo handoff and privacy
+
+No account or password is passed to the camera URL. A random per-capture nonce and the parent's origin are placed in a URL fragment (not sent as an HTTP request query). The camera accepts only a recognised inventory/development parent and sends an in-memory JPEG through postMessage. The form checks exact camera origin, popup source, nonce, image format and size before accepting it, then acknowledges receipt. The camera stops its media tracks and closes after acknowledgement. No image is stored on GitHub or sent to a third-party camera service. The existing authenticated stock submission stores the photo in the configured private Drive folder.
+
+The camera entrypoint does not expose an upload route. Browser/devtools tampering and photographs of another screen cannot be excluded by a webpage; no biometric identity or liveness assurance is claimed.
+
+### Verification
+
+The browser tests now serve both index.html and camera.html. The sandbox test explicitly blocks camera permission in the inventory iframe but allows it in the separate top-level camera response; it checks capture delivery and rejection of forged messages. The stock tests use simulated cameras and confirm permissions, photos, inventory changes and administrator operations. Physical devices still need a /dev test after Pages is enabled.

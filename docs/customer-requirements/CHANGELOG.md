@@ -7,3 +7,5 @@ Camera clarification: the foreman may photograph the employee or themselves usin
 Further revision: both movements require Type/Account/Password and a simple live capture. Staff accounts moves to a separate dynamic management page; fresh admin password is required for every change. Foreman-only stock in remains. Older fixed six-slot descriptions are superseded.
 
 Status refinement: remove account Type, show Account/Status/Action, and select IN/OUT/both permissions. Operation permission is authoritative rather than a role. Existing role-based access is mapped without expansion.
+
+Direct-camera refinement: a separate HTTPS camera page avoids requesting webcam access inside the inventory iframe. No gallery fallback is added. GitHub Pages hosting and actual phone capture remain deployment prerequisites.
