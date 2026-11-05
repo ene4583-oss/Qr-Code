@@ -207,3 +207,31 @@ Administrator login, foreman stock-in login and all six foreman password-setting
 ### Password length clarification
 
 The client has requested no fixed password length. Foreman password configuration and verification no longer impose minimum or maximum character counts; the browser fields have no minlength/maxlength attributes. Non-empty passwords are still required to enable or log into an account. Leaving an existing password blank when editing keeps it unchanged. Show/hide controls and independent foreman passwords remain. Update both Code.gs and Index.html for this change.
+
+## Current revision — Staff accounts and simple capture (5 November 2026)
+
+This section supersedes the earlier six-slot foreman UI and unauthenticated stock-out instructions.
+
+### Stock in and stock out
+
+Both forms now require **Type, Account and Password**, with no password-length rule. Foreman accounts can record both movements; Staff accounts can record stock out only. The backend checks the stored type and credentials, so changing the browser dropdown cannot grant stock-in access. Employee identity in new transactions is the authenticated account, not a freely entered employee ID. Purpose stays removed.
+
+The main photo control is a simple **Upload face photo** text link. Clicking it opens a compact camera dialog with **Switch camera** and **Take photo**. Either action requires a new live capture; neither has a gallery/file picker. The operator may photograph the employee or themselves. Camera metadata is checked for freshness but does not establish face recognition, liveness or image authenticity. Target phone/Google iframe permissions must still be checked before publishing.
+
+### Separate Staff accounts page
+
+Use the new **Staff accounts** navigation item and the same administrator login as Manage inventory. The page supports adding, editing, disabling and deleting accounts, without the old fixed six-account limit. Every account save or deletion has a separate, initially empty administrator-password confirmation field. The cached administrator session is used only to read the list; mutation calls use the password entered for that individual operation and verify it on the server.
+
+Type is Foreman or Staff. Account names are case-insensitively unique, accept 1–80 ASCII letters/numbers/dot/@/hyphen/underscore, and may be edited while retaining a stable internal account ID. New accounts need a non-empty password. Leaving an edited password empty keeps it unchanged. Password-eye controls show only typed values; stored passwords/hashes are never returned to the browser.
+
+### Migration and records
+
+Existing FOREMAN_ACCESS_V1 slots are read automatically as Foreman accounts using their F1–F6 slot IDs as account names and their existing passwords. Disabled slots remain disabled. They appear in Staff accounts and can be renamed; do not recreate or clear them just to upgrade. New/edited accounts use one Script Property per stable ID (STAFF_ACCOUNT_V2_...). This avoids a single-property JSON limit; platform total-storage quotas still apply. Deletion retains a non-authenticating tombstone so a removed legacy foreman cannot reappear; old transactions/photos remain untouched. Updating to an earlier code version can re-enable old authentication behavior and is not an account-deletion recovery procedure.
+
+Transactions retain columns A–N and add O–Q: staffId, staffType and staffAccount. Existing employee and foreman history stays readable; new entries are linked to the authenticated account. No login or administrator password is written to a transaction or to public branding settings. Original quantity, insufficient-stock, duplicate-request, correction and email rules remain.
+
+### Deploy safely
+
+Replace both Code.gs and Index.html, then test /dev. Do not reimport sheets or change IDs/admin properties. In Staff accounts, verify the existing foremen and create the Staff logins needed before publishing: the new release rejects previously anonymous stock-out submissions. Test wrong passwords, Foreman in/out, Staff out, rejection of Staff in, live photos on intended phones, and fresh admin confirmation for each account change. Then update the existing production deployment version to preserve QR URLs.
+
+Local backend, browser and sandboxed document.write tests cover the new access model, account management, legacy import/tombstones, camera dialog and existing inventory functions. Simulated-camera tests do not establish real Google-hosted phone-camera permission.

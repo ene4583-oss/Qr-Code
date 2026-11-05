@@ -1,11 +1,11 @@
 const vm=require('vm'),fs=require('fs'),assert=require('assert/strict');
 const sheets={Products:[['code','name','category','unit','opening','threshold','imageUrl','ordered'],['DU01','Glove','Daily Use','PAIR',10,8,'',false]],Transactions:[['requestId','time','code','type','quantity','employee','note','photoUrl']]};let files=0,mails=0,lastMail=null;const properties={SHEET_ID:'test',ADMIN_PASSWORD:'secret',PHOTO_FOLDER_ID:'folder',ADMIN_EMAIL:'admin@example.com'},authCache={};
 const sheet=n=>({getDataRange:()=>({getValues:()=>sheets[n].map(r=>r.slice())}),appendRow:r=>sheets[n].push(r),getRange:(r,c)=>({setValue:v=>sheets[n][r-1][c-1]=v,setValues:values=>values.forEach((row,di)=>row.forEach((value,dj)=>{sheets[n][r-1+di][c-1+dj]=value;}))})});
-const context={console,PropertiesService:{getScriptProperties:()=>({getProperty:k=>properties[k],setProperty:(k,v)=>properties[k]=v})},CacheService:{getScriptCache:()=>({get:k=>authCache[k],put:(k,v)=>authCache[k]=v,remove:k=>delete authCache[k]})},SpreadsheetApp:{openById:()=>({getSheetByName:sheet}),flush(){}},LockService:{getScriptLock:()=>({waitLock(){},releaseLock(){}})},DriveApp:{getFolderById:()=>({createFile:()=>{files++;return {getUrl:()=> 'https://drive.google.com/file/test',setTrashed(){}}}})},Utilities:{getUuid:()=>require('crypto').randomUUID(),computeHmacSha256Signature:(password,salt)=>Array.from(require('crypto').createHmac('sha256',salt).update(password).digest()),base64Decode:s=>Buffer.from(s,'base64'),newBlob:()=>({})},UrlFetchApp:{fetch:()=>({getResponseCode:()=>200,getBlob:()=>({getContentType:()=> 'image/jpeg',getBytes:()=>Buffer.from([255,216,255])})})},MailApp:{sendEmail:message=>{mails++;lastMail=message;}}};vm.createContext(context);vm.runInContext(fs.readFileSync(require('path').join(__dirname,'../apps-script/Code.gs'),'utf8'),context);
-const accounts=Array.from({length:6},(_,i)=>({id:'F'+(i+1),name:'Foreman '+(i+1),enabled:i<2,newPassword:'ForemanPass'+(i+1)}));context.saveForemanAccounts('secret',accounts);assert.equal(context.getForemen().length,2);assert(!JSON.stringify(context.getForemanAccounts('secret')).includes('hash'));assert(!properties.FOREMAN_ACCESS_V1.includes('ForemanPass'));
+const context={console,PropertiesService:{getScriptProperties:()=>({getProperty:k=>properties[k],setProperty:(k,v)=>properties[k]=v,getProperties:()=>({...properties})})},CacheService:{getScriptCache:()=>({get:k=>authCache[k],put:(k,v)=>authCache[k]=v,remove:k=>delete authCache[k]})},SpreadsheetApp:{openById:()=>({getSheetByName:sheet}),flush(){}},LockService:{getScriptLock:()=>({waitLock(){},releaseLock(){}})},DriveApp:{getFolderById:()=>({createFile:()=>{files++;return {getUrl:()=> 'https://drive.google.com/file/test',setTrashed(){}}}})},Utilities:{getUuid:()=>require('crypto').randomUUID(),computeHmacSha256Signature:(password,salt)=>Array.from(require('crypto').createHmac('sha256',salt).update(password).digest()),base64Decode:s=>Buffer.from(s,'base64'),newBlob:()=>({})},UrlFetchApp:{fetch:()=>({getResponseCode:()=>200,getBlob:()=>({getContentType:()=> 'image/jpeg',getBytes:()=>Buffer.from([255,216,255])})})},MailApp:{sendEmail:message=>{mails++;lastMail=message;}}};vm.createContext(context);vm.runInContext(fs.readFileSync(require('path').join(__dirname,'../apps-script/Code.gs'),'utf8'),context);
+const accounts=Array.from({length:6},(_,i)=>({id:'F'+(i+1),name:'Foreman '+(i+1),enabled:i<2,salt:'legacy-'+i,hash:context.staffPasswordHash_('ForemanPass'+(i+1),'legacy-'+i)}));properties.FOREMAN_ACCESS_V1=JSON.stringify(accounts);assert.equal(context.getStaffAccounts('secret').length,6);assert(!JSON.stringify(context.getStaffAccounts('secret')).includes('hash'));
 assert(!('stock' in context.getCatalog()[0]));assert(!('opening' in context.getCatalog()[0]));assert.throws(()=>context.getAdmin('wrong'),/password/);
-let req={requestId:'request_test_001',code:'DU01',type:'OUT',quantity:3,employee:'=HYPERLINK("x")',note:'test',photo:'data:image/jpeg;base64,YWJj'};
-assert(context.submitMovement(req).ok);assert.equal(context.getAdmin('secret').products[0].stock,7);assert.equal(mails,1);context.submitMovement(req);assert.equal(files,1);assert.equal(sheets.Transactions.length,2);assert(sheets.Transactions[1][5].startsWith("'="));assert.throws(()=>context.submitMovement({...req,requestId:'request_test_002',quantity:8}),/Unable to issue/);assert.throws(()=>context.submitMovement({...req,requestId:'request_test_003',quantity:-1}),/Quantity/);assert.throws(()=>context.submitMovement({...req,requestId:'request_test_004',type:'IN'}),/password/);assert.throws(()=>context.submitMovement({...req,requestId:'request_test_005',photo:''}),/photo/);context.updateProduct('secret','DU01',8,true);context.submitMovement({...req,requestId:'request_test_006',type:'IN',quantity:20,foremanId:'F1',foremanPassword:'ForemanPass1',photoSource:'camera',capturedAt:new Date().toISOString()});assert.equal(context.getAdmin('secret').products[0].stock,27);assert.equal(context.getAdmin('secret').products[0].ordered,false);context.submitMovement({...req,requestId:'request_test_007',quantity:1.001});assert.equal(context.getAdmin('secret').products[0].stock,25.999);console.log('PASS backend simulation: private catalog, auth, OUT/IN, threshold mail, duplicate idempotency, insufficient stock, negative quantity, photo required, spreadsheet formula escaping, order reset, decimal quantities. Google services mocked.');
+let req={requestId:'request_test_001',code:'DU01',type:'OUT',quantity:3,employee:'=HYPERLINK("x")',note:'test',staffType:'Foreman',account:'F1',staffPassword:'ForemanPass1',photoSource:'camera',capturedAt:new Date().toISOString(),photo:'data:image/jpeg;base64,YWJj'};
+assert(context.submitMovement(req).ok);assert.equal(context.getAdmin('secret').products[0].stock,7);assert.equal(mails,1);context.submitMovement(req);assert.equal(files,1);assert.equal(sheets.Transactions.length,2);assert(context.safe_('=HYPERLINK("x")').startsWith("'="));assert.equal(sheets.Transactions[1][5],'F1');assert.throws(()=>context.submitMovement({...req,requestId:'request_test_002',quantity:8}),/Unable to issue/);assert.throws(()=>context.submitMovement({...req,requestId:'request_test_003',quantity:-1}),/Quantity/);assert.throws(()=>context.submitMovement({...req,requestId:'request_test_004',type:'IN',staffPassword:'wrong',adminPassword:'secret'}),/password/);assert.throws(()=>context.submitMovement({...req,requestId:'request_test_005',photo:''}),/photo/);context.updateProduct('secret','DU01',8,true);context.submitMovement({...req,requestId:'request_test_006',type:'IN',quantity:20,staffType:'Foreman',account:'F1',staffPassword:'ForemanPass1',photoSource:'camera',capturedAt:new Date().toISOString()});assert.equal(context.getAdmin('secret').products[0].stock,27);assert.equal(context.getAdmin('secret').products[0].ordered,false);context.submitMovement({...req,requestId:'request_test_007',quantity:1.001});assert.equal(context.getAdmin('secret').products[0].stock,25.999);console.log('PASS backend simulation: private catalog, auth, OUT/IN, threshold mail, duplicate idempotency, insufficient stock, negative quantity, photo required, spreadsheet formula escaping, order reset, decimal quantities. Google services mocked.');
 // Product upload must be admin-only, must leave balances intact, and must not
 // expose transaction photos or arbitrary Drive files through the catalog.
 let storedName='',storedBlob=null,trashed=false;
@@ -84,33 +84,42 @@ context.sendReorderEmail_('admin@example.com',{code:'OTHER',name:'Inline image',
 assert(lastMail.inlineImages.productPhoto);assert.match(lastMail.body,/Please arrange replenishment/);
 console.log('PASS reorder email: inline product images, stock/threshold/replenishment text, HTML escaping, missing-image fallback, out-of-stock message; legacy note inputs ignored; no new purpose recorded.');
 
-// Verify new foreman-only receipts independently of administrator credentials.
-assert.throws(()=>context.saveForemanAccounts('wrong',accounts),/administrator password/);
-assert.throws(()=>context.getForemanAccounts('wrong'),/administrator password/);
-assert.throws(()=>context.saveForemanAccounts('secret',accounts.slice(0,5)),/six/);
-context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:a.id==='F2'?'x':a.newPassword})));assert.equal(context.verifyForeman_('F2','x').id,'F2');context.saveForemanAccounts('secret',accounts);
-assert.throws(()=>context.verifyForeman_('F1','secret'),/Incorrect foreman/);
-assert.throws(()=>context.verifyForeman_('F1','ForemanPass2'),/Incorrect foreman/);
-assert.equal(context.verifyForeman_('F2','ForemanPass2').name,'Foreman 2');
-context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:''})));
-assert.equal(context.verifyForeman_('F1','ForemanPass1').id,'F1');
-assert.throws(()=>context.verifyForeman_('F3','ForemanPass3'),/Incorrect foreman/);
-const receipt={...req,requestId:'foreman_receipt_001',type:'IN',quantity:1,foremanId:'F1',foremanPassword:'ForemanPass1',photoSource:'camera',capturedAt:new Date().toISOString()};
-assert.throws(()=>context.submitMovement({...receipt,photoSource:'file'}),/fresh face photo/);
-assert.throws(()=>context.submitMovement({...receipt,capturedAt:new Date(Date.now()-11*60*1000).toISOString()}),/fresh face photo/);
-context.DriveApp.getFolderById=()=>({createFile:()=>({getUrl:()=> 'https://drive.google.com/file/face',setTrashed(){}})});
-const stockBefore=context.getAdmin('secret').products[0].stock;context.submitMovement(receipt);
-const recorded=sheets.Transactions.find(r=>r[0]===receipt.requestId);assert.equal(recorded[10],'F1');assert.equal(recorded[11],'Foreman 1');assert.equal(recorded[12],'camera');assert(recorded[13]);assert.equal(recorded[6],'');assert(!JSON.stringify(recorded).includes('ForemanPass'));
-context.submitMovement(receipt);assert.equal(context.getAdmin('secret').products[0].stock,stockBefore+1);
-context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:'',enabled:a.id==='F1'?false:a.enabled})));
-assert.throws(()=>context.submitMovement({...receipt,requestId:'disabled_receipt_001'}),/Incorrect foreman/);
-console.log('PASS foreman receipts: six private password slots, admin-only configuration, password preservation, independent credentials, disabled account, live-camera metadata/freshness, audit fields, no password leakage, idempotent stock addition.');
-context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:a.id==='F2'?'OnlyLettersAllowed':'',enabled:a.id==='F2'})));
-assert.equal(context.verifyForeman_('F2','OnlyLettersAllowed').id,'F2');
-console.log('PASS letters-only foreman password accepted; no numeric-character requirement.');
 
-const longPassword='letters'.repeat(30);
-context.saveForemanAccounts('secret',accounts.map(a=>({...a,enabled:a.id==='F2',newPassword:a.id==='F2'?longPassword:''})));
-assert.equal(context.verifyForeman_('F2',longPassword).id,'F2');
-assert.throws(()=>context.verifyForeman_('F2',''),/Incorrect foreman/);
-console.log('PASS password length: one-character and >128-character passwords accepted; empty login password rejected.');
+// Dynamic staff accounts preserve legacy foremen and require admin credentials
+// on every mutation, regardless of whether an admin UI session is already open.
+context.Utilities.getUuid=()=>require('crypto').randomUUID();
+const staffInput={account:'worker01',type:'Staff',enabled:true,newPassword:'x'};
+assert.throws(()=>context.getStaffAccounts('wrong'),/administrator password/);
+assert.throws(()=>context.saveStaffAccount('wrong',staffInput),/administrator password/);
+assert.throws(()=>context.saveStaffAccount('secret',{...staffInput,newPassword:''}),/Set a password/);
+context.saveStaffAccount('secret',staffInput);
+assert.throws(()=>context.saveStaffAccount('secret',{...staffInput,account:'WORKER01'}),/already exists/);
+const worker=context.getStaffAccounts('secret').find(a=>a.account==='worker01');assert(worker);assert(!JSON.stringify(worker).includes('salt'));assert(!JSON.stringify(worker).includes('hash'));assert(!JSON.stringify(worker).includes('newPassword'));
+assert.equal(context.verifyStaff_('Staff','WORKER01','x','OUT').id,worker.id);
+assert.throws(()=>context.verifyStaff_('Staff','worker01','x','IN'),/Only Foreman/);
+assert.throws(()=>context.verifyStaff_('Foreman','worker01','x','OUT'),/Incorrect/);
+assert.throws(()=>context.verifyStaff_('Staff','worker01','secret','OUT'),/Incorrect/);
+assert.throws(()=>context.saveStaffAccount('wrong',{...staffInput,id:worker.id,newPassword:'new'}),/administrator password/);
+context.saveStaffAccount('secret',{...staffInput,id:worker.id,account:'worker02',newPassword:''});assert.equal(context.verifyStaff_('Staff','worker02','x','OUT').id,worker.id);
+assert.throws(()=>context.deleteStaffAccount('wrong',worker.id),/administrator password/);
+context.deleteStaffAccount('secret',worker.id);context.deleteStaffAccount('secret',worker.id);assert.throws(()=>context.verifyStaff_('Staff','worker02','x','OUT'),/Incorrect/);
+assert.equal(context.verifyStaff_('Foreman','F1','ForemanPass1','IN').id,'F1');
+context.saveStaffAccount('secret',{id:'F1',account:'chief',type:'Foreman',enabled:true,newPassword:''});assert.equal(context.verifyStaff_('Foreman','chief','ForemanPass1','IN').id,'F1');
+assert.throws(()=>context.verifyStaff_('Foreman','F1','ForemanPass1','IN'),/Incorrect/);
+const longPassword='letters'.repeat(30);context.saveStaffAccount('secret',{id:'F1',account:'chief',type:'Foreman',enabled:true,newPassword:longPassword});assert.equal(context.verifyStaff_('Foreman','chief',longPassword,'OUT').id,'F1');
+context.DriveApp.getFolderById=()=>({createFile:()=>({getUrl:()=> 'https://drive.google.com/file/face',setTrashed(){}})});
+const receipt={...req,requestId:'staff_receipt_001',type:'IN',quantity:1,account:'chief',staffPassword:longPassword};
+assert.throws(()=>context.submitMovement({...receipt,photoSource:'file'}),/fresh face photo/);
+assert.throws(()=>context.submitMovement({...receipt,capturedAt:new Date(Date.now()-11*60000).toISOString()}),/fresh face photo/);
+const beforeStock=context.getAdmin('secret').products[0].stock;context.submitMovement(receipt);context.submitMovement(receipt);assert.equal(context.getAdmin('secret').products[0].stock,beforeStock+1);
+const record=sheets.Transactions.find(r=>r[0]===receipt.requestId);assert.equal(record[5],'chief');assert.equal(record[14],'F1');assert.equal(record[15],'Foreman');assert.equal(record[16],'chief');assert(!JSON.stringify(record).includes(longPassword));
+context.saveStaffAccount('secret',{account:'ordinary',type:'Staff',enabled:true,newPassword:'p'});
+const ordinary=context.getStaffAccounts('secret').find(a=>a.account==='ordinary');
+assert.throws(()=>context.submitMovement({...receipt,requestId:'staff_only_in_001',staffType:'Staff',account:'ordinary',staffPassword:'p'}),/Only Foreman/);
+context.submitMovement({...receipt,requestId:'staff_out_000001',type:'OUT',staffType:'Staff',account:'ordinary',staffPassword:'p'});
+assert.throws(()=>context.submitMovement({...receipt,requestId:'staff_file_00001',type:'OUT',staffType:'Staff',account:'ordinary',staffPassword:'p',photoSource:'file'}),/fresh face photo/);
+context.deleteStaffAccount('secret','F1');assert(!context.getStaffAccounts('secret').some(a=>a.id==='F1'));assert.throws(()=>context.verifyStaff_('Foreman','chief',longPassword,'IN'),/Incorrect/);assert(context.getAdmin('secret').transactions.some(t=>t.requestId===receipt.requestId));
+assert.throws(()=>context.verifyStaff_('Staff','ordinary','','OUT'),/Incorrect/);
+for(let i=0;i<8;i++)context.saveStaffAccount('secret',{account:'extra'+i,type:'Staff',enabled:true,newPassword:'a'});
+assert(context.getStaffAccounts('secret').length>6);
+console.log('PASS staff access: both movements authenticated; staff OUT only; no fixed account count; short/long passwords; fresh live photos; per-mutation admin checks; legacy foreman preservation/edit/tombstone; no secrets in responses or transactions; stable audit identity.');

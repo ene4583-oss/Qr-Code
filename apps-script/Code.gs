@@ -56,13 +56,9 @@ function submitMovement(data) {
     var qty=Number(data.quantity);
     if (!isFinite(qty)||qty<=0||qty>1000000||Math.abs(Math.round(qty*1000)-qty*1000)>0.000001) throw new Error('Quantity must be positive, with at most three decimal places.');
     if (['IN','OUT'].indexOf(data.type)<0) throw new Error('Invalid movement type');
-    var foreman=null;
-    if(data.type==='OUT'&&(!String(data.employee||'').trim()||String(data.employee).length>100))throw new Error('Enter an employee ID (max 100 characters).');
-    if(data.type==='IN'){
-      foreman=verifyForeman_(String(data.foremanId||''),data.foremanPassword);
-      var captured=Date.parse(data.capturedAt||'');
-      if(data.photoSource!=='camera'||!isFinite(captured)||Date.now()-captured>10*60*1000||captured-Date.now()>60000)throw new Error('Take a fresh face photo using the live camera. Check your device clock if this message persists.');
-    }
+    var staff=verifyStaff_(String(data.staffType||''),data.account,data.staffPassword,data.type);
+    var captured=Date.parse(data.capturedAt||'');
+    if(data.photoSource!=='camera'||!isFinite(captured)||Date.now()-captured>10*60*1000||captured-Date.now()>60000)throw new Error('Take a fresh face photo using the live camera. Check your device clock if this message persists.');
     var p=products_().filter(function(x){return x.code===data.code;})[0];
     if (!p||inactive_(p)) throw new Error('Product not found or inactive');
     if(data.type==='OUT'&&qty>p.stock) throw new Error('Unable to issue items. Please contact the administrator to check stock.');
@@ -74,7 +70,7 @@ function submitMovement(data) {
     if(!folderId) throw new Error('The administrator has not configured the photo folder.');
     var ext=match[1].split('/')[1];
     var file=DriveApp.getFolderById(folderId).createFile(Utilities.newBlob(bytes,match[1],data.requestId+'.'+ext));
-    try { transactionSheet_().appendRow([data.requestId,new Date(),p.code,data.type,qty,safe_(foreman?foreman.id+' — '+foreman.name:data.employee),'',file.getUrl(),'','',foreman?foreman.id:'',foreman?safe_(foreman.name):'',foreman?'camera':'file',foreman?new Date(captured).toISOString():'']); SpreadsheetApp.flush(); }
+    try { transactionSheet_().appendRow([data.requestId,new Date(),p.code,data.type,qty,safe_(staff.account),'',file.getUrl(),'','',staff.type==='Foreman'?staff.id:'',staff.type==='Foreman'?safe_(staff.account):'','camera',new Date(captured).toISOString(),staff.id,staff.type,safe_(staff.account)]); SpreadsheetApp.flush(); }
     catch(e) { file.setTrashed(true);throw e; }
     var next=Math.round((p.stock+(data.type==='IN'?qty:-qty))*1000)/1000;
     if(data.type==='IN'&&next>p.threshold) setOrdered_(p.code,false);
@@ -151,7 +147,7 @@ function ensureColumns_(name,expected) {
   return s;
 }
 function productSheet_(){return ensureColumns_('Products',['code','name','category','unit','opening','threshold','imageUrl','ordered','active','deletedAt']);}
-function transactionSheet_(){return ensureColumns_('Transactions',['requestId','time','code','type','quantity','employee','note','photoUrl','deletedAt','deleteReason','foremanId','foremanName','photoSource','capturedAt']);}
+function transactionSheet_(){return ensureColumns_('Transactions',['requestId','time','code','type','quantity','employee','note','photoUrl','deletedAt','deleteReason','foremanId','foremanName','photoSource','capturedAt','staffId','staffType','staffAccount']);}
 function number_(v,label) {
   if(v===''||v===null||v===undefined)throw new Error(label+' is required.');
   var n=Number(v);
@@ -265,47 +261,48 @@ function sendReorderEmail_(email,product,stock) {
   MailApp.sendEmail(message);
 }
 
-// Foreman access is separate from administrator access. Only administrators may
-// configure the six slots; passwords/hashes never appear in catalog responses.
-function foremanConfig_(){
-  var raw=PropertiesService.getScriptProperties().getProperty('FOREMAN_ACCESS_V1');
-  return raw?JSON.parse(raw):[];
+// Staff accounts use separate Script Properties so adding people does not hit
+// the per-value size limit of one JSON array. Deleted legacy slots stay tombstoned.
+function foremanConfig_(){var raw=PropertiesService.getScriptProperties().getProperty('FOREMAN_ACCESS_V1');return raw?JSON.parse(raw):[];}
+function staffPasswordHash_(password,salt){return Utilities.computeHmacSha256Signature(String(password),salt).map(function(b){return ('0'+((b+256)%256).toString(16)).slice(-2);}).join('');}
+function staffConfig_(){
+ var props=PropertiesService.getScriptProperties().getProperties(),prefix='STAFF_ACCOUNT_V2_',accounts={};
+ Object.keys(props).filter(function(key){return key.indexOf(prefix)===0;}).forEach(function(key){var value=JSON.parse(props[key]);accounts[value.id]=value;});
+ foremanConfig_().forEach(function(old){if(!accounts[old.id])accounts[old.id]={id:old.id,account:old.id,name:old.name,type:'Foreman',enabled:!!old.enabled,salt:old.salt,hash:old.hash,legacy:true};});
+ return Object.keys(accounts).map(function(id){return accounts[id];});
 }
-function foremanPasswordHash_(password,salt){
-  return Utilities.computeHmacSha256Signature(String(password),salt).map(function(b){return ('0'+((b+256)%256).toString(16)).slice(-2);}).join('');
+function getStaffAccounts(password){verifyAdmin_(password);return staffConfig_().filter(function(a){return !a.deletedAt;}).map(function(a){return {id:a.id,account:a.account,type:a.type,enabled:a.enabled,hasPassword:!!a.hash,legacy:!!a.legacy};});}
+function saveStaffAccount(adminPassword,data){
+ verifyAdmin_(adminPassword);
+ var account=String(data&&data.account||'').trim(),id=String(data&&data.id||''),type=data&&data.type,newPassword=String(data&&data.newPassword||'');
+ if(!/^[A-Za-z0-9][A-Za-z0-9_.@-]{0,79}$/.test(account))throw new Error('Account must be 1–80 letters, numbers, dots, @, hyphens or underscores.');
+ if(['Foreman','Staff'].indexOf(type)<0||typeof data.enabled!=='boolean')throw new Error('Choose a valid account type and status.');
+ var lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{
+  var all=staffConfig_(),old=id?all.filter(function(a){return a.id===id&&!a.deletedAt;})[0]:null;
+  if(id&&!old)throw new Error('Account no longer exists. Refresh the list.');
+  if(all.some(function(a){return !a.deletedAt&&a.id!==id&&a.account.toLowerCase()===account.toLowerCase();}))throw new Error('This account name already exists.');
+  if(!old&&!newPassword)throw new Error('Set a password for the new account.');
+  var salt=old&&old.salt||Utilities.getUuid(),hash=old&&old.hash||'';
+  if(newPassword){salt=Utilities.getUuid();hash=staffPasswordHash_(newPassword,salt);}
+  if(data.enabled&&!hash)throw new Error('Set a password before enabling this account.');
+  var value={id:old?old.id:Utilities.getUuid(),account:account,name:account,type:type,enabled:data.enabled,salt:salt,hash:hash,updatedAt:new Date().toISOString()};
+  PropertiesService.getScriptProperties().setProperty('STAFF_ACCOUNT_V2_'+value.id,JSON.stringify(value));
+  return {ok:true,message:old?'Staff account updated.':'Staff account added.'};
+ }finally{lock.releaseLock();}
 }
-function getForemen(){return foremanConfig_().filter(function(x){return x.enabled&&x.hash;}).map(function(x){return {id:x.id,name:x.name};});}
-function getForemanAccounts(password){
-  verifyAdmin_(password);var accounts=foremanConfig_();
-  return [1,2,3,4,5,6].map(function(i){var id='F'+i,x=accounts.filter(function(x){return x.id===id;})[0]||{};return {id:id,name:x.name||('Foreman '+i),enabled:!!x.enabled,hasPassword:!!x.hash};});
+function deleteStaffAccount(adminPassword,id){
+ verifyAdmin_(adminPassword);var lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{var account=staffConfig_().filter(function(a){return a.id===id;})[0];if(!account)throw new Error('Account not found.');if(account.deletedAt)return {ok:true};
+  PropertiesService.getScriptProperties().setProperty('STAFF_ACCOUNT_V2_'+id,JSON.stringify({id:id,account:account.account,type:account.type,enabled:false,deletedAt:new Date().toISOString()}));
+  return {ok:true,message:'Staff account deleted. Existing transaction history is retained.'};
+ }finally{lock.releaseLock();}
 }
-function saveForemanAccounts(password,accounts){
-  verifyAdmin_(password);
-  if(!Array.isArray(accounts)||accounts.length!==6)throw new Error('Provide all six foreman slots.');
-  var lock=LockService.getScriptLock();lock.waitLock(30000);
-  try{
-    var old=foremanConfig_(),updated=[];
-    for(var i=1;i<=6;i++){
-      var id='F'+i,matches=accounts.filter(function(x){return x.id===id;});
-      if(matches.length!==1)throw new Error('Each foreman slot must appear exactly once.');
-      var input=matches[0],previous=old.filter(function(x){return x.id===id;})[0]||{},name=String(input.name||'').trim(),nextPassword=String(input.newPassword||'');
-      if(!name||name.length>80||typeof input.enabled!=='boolean')throw new Error('Enter a foreman name of 1–80 characters and a valid enabled status.');
-      var salt=previous.salt||Utilities.getUuid(),hash=previous.hash||'';
-      if(nextPassword){salt=Utilities.getUuid();hash=foremanPasswordHash_(nextPassword,salt);}
-      if(input.enabled&&!hash)throw new Error('Set a password before enabling '+id+'.');
-      updated.push({id:id,name:name,enabled:input.enabled,salt:salt,hash:hash});
-    }
-    PropertiesService.getScriptProperties().setProperty('FOREMAN_ACCESS_V1',JSON.stringify(updated));
-    return {ok:true,message:'Foreman access saved.'};
-  }finally{lock.releaseLock();}
-}
-function verifyForeman_(id,password){
-  var account=foremanConfig_().filter(function(x){return x.id===id&&x.enabled&&x.hash;})[0];
-  if(!account||!password)throw new Error('Incorrect foreman account or password.');
-  var cache=CacheService.getScriptCache(),key='foreman-fail-'+id,count=Number(cache.get(key)||0);
-  if(count>=5)throw new Error('Too many failed attempts. Try again in 5 minutes.');
-  var actual=foremanPasswordHash_(password,account.salt),different=actual.length^account.hash.length;
-  for(var i=0;i<actual.length;i++)different|=actual.charCodeAt(i)^account.hash.charCodeAt(i);
-  if(different){cache.put(key,String(count+1),300);throw new Error('Incorrect foreman account or password.');}
-  cache.remove(key);return {id:account.id,name:account.name};
+function verifyStaff_(type,account,password,movement){
+ account=String(account||'').trim();var person=staffConfig_().filter(function(a){return !a.deletedAt&&a.enabled&&a.account.toLowerCase()===account.toLowerCase()&&a.type===type&&a.hash;})[0];
+ if(!person||!password)throw new Error('Incorrect type, account or password.');
+ if(movement==='IN'&&person.type!=='Foreman')throw new Error('Only Foreman accounts can record stock in.');
+ var cache=CacheService.getScriptCache(),key='staff-fail-'+person.id,count=Number(cache.get(key)||0);if(count>=5)throw new Error('Too many failed attempts. Try again in 5 minutes.');
+ var actual=staffPasswordHash_(password,person.salt),diff=actual.length^person.hash.length;for(var i=0;i<actual.length;i++)diff|=actual.charCodeAt(i)^person.hash.charCodeAt(i);
+ if(diff){cache.put(key,String(count+1),300);throw new Error('Incorrect type, account or password.');}cache.remove(key);return person;
 }
