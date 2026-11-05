@@ -189,3 +189,11 @@ Run `node tests/backend.cjs`, `node tests/browser.cjs`, and `node tests/foreman-
 ### Camera clarification — employee or foreman
 
 The foreman may photograph the employee or themselves. Stock in now offers **Front camera — photograph yourself** and **Rear camera — photograph an employee**. Changing the selection stops the previous stream, clears the previous capture and opens the selected camera. If the browser reports a different available camera, the interface explains the fallback. Available hardware and Google iframe permissions still govern actual camera use. The receipt records the authenticated operating foreman; it does not claim to identify the person in the photo. No recognition/liveness checks or gallery upload are added. This refinement only changes Index.html.
+
+### Browser script compatibility and upload wording
+
+Administrator metrics, inventory/history rows and alert dialogs now use DOM construction instead of nested JavaScript template literals. All client template literals have been removed to reduce parsing/rewriting complexity when the page is delivered through the Apps Script HTML wrapper. This is a compatibility change; it does not prove the exact root cause of a deployed or incompletely pasted script error. Check the actual /dev page after replacing complete files.
+
+The worker form's native Choose files button is replaced by a custom **Upload face photo** control. For stock in the similarly labelled action still opens the live camera; gallery upload is not added. Stock out retains its original picker/camera behavior. Image presence is validated by the form submission handler and backend, avoiding a hidden required file field that cannot receive focus.
+
+Local tests cover full inventory workflows, front/rear camera selection and an additional sandboxed iframe using document.write. Run `node tests/html-write-browser.cjs` for the latter. Actual Google-hosted initialization and camera permissions still require a live /dev check. No inventory reset, new deployment URL or data reimport is required.
