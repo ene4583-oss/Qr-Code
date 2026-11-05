@@ -109,15 +109,15 @@ assert.throws(()=>context.verifyStaff_('F1','ForemanPass1','IN'),/Incorrect/);
 const longPassword='letters'.repeat(30);context.saveStaffAccount('secret',{id:'F1',account:'chief',permissions:['IN','OUT'],newPassword:longPassword});assert.equal(context.verifyStaff_('chief',longPassword,'OUT').id,'F1');
 context.DriveApp.getFolderById=()=>({createFile:()=>({getUrl:()=> 'https://drive.google.com/file/face',setTrashed(){}})});
 const receipt={...req,requestId:'staff_receipt_001',type:'IN',quantity:1,account:'chief',staffPassword:longPassword};
-assert.throws(()=>context.submitMovement({...receipt,photoSource:'file'}),/fresh face photo/);
-assert.throws(()=>context.submitMovement({...receipt,capturedAt:new Date(Date.now()-11*60000).toISOString()}),/fresh face photo/);
+assert.throws(()=>context.submitMovement({...receipt,photoSource:'file'}),/face photo/);
+assert.throws(()=>context.submitMovement({...receipt,capturedAt:new Date(Date.now()-11*60000).toISOString()}),/face photo/);
 const beforeStock=context.getAdmin('secret').products[0].stock;context.submitMovement(receipt);context.submitMovement(receipt);assert.equal(context.getAdmin('secret').products[0].stock,beforeStock+1);
 const record=sheets.Transactions.find(r=>r[0]===receipt.requestId);assert.equal(record[5],'chief');assert.equal(record[14],'F1');assert.equal(record[15],'Foreman');assert.equal(record[16],'chief');assert(!JSON.stringify(record).includes(longPassword));
 context.saveStaffAccount('secret',{account:'ordinary',permissions:['OUT'],newPassword:'p'});
 const ordinary=context.getStaffAccounts('secret').find(a=>a.account==='ordinary');
 assert.throws(()=>context.submitMovement({...receipt,requestId:'staff_only_in_001',staffType:'Staff',account:'ordinary',staffPassword:'p'}),/not allowed/);
 context.submitMovement({...receipt,requestId:'staff_out_000001',type:'OUT',staffType:'Staff',account:'ordinary',staffPassword:'p'});
-assert.throws(()=>context.submitMovement({...receipt,requestId:'staff_file_00001',type:'OUT',staffType:'Staff',account:'ordinary',staffPassword:'p',photoSource:'file'}),/fresh face photo/);
+assert.throws(()=>context.submitMovement({...receipt,requestId:'staff_file_00001',type:'OUT',staffType:'Staff',account:'ordinary',staffPassword:'p',photoSource:'file'}),/face photo/);
 context.deleteStaffAccount('secret','F1');assert(!context.getStaffAccounts('secret').some(a=>a.id==='F1'));assert.throws(()=>context.verifyStaff_('chief',longPassword,'IN'),/Incorrect/);assert(context.getAdmin('secret').transactions.some(t=>t.requestId===receipt.requestId));
 assert.throws(()=>context.verifyStaff_('ordinary','','OUT'),/Incorrect/);
 for(let i=0;i<8;i++)context.saveStaffAccount('secret',{account:'extra'+i,permissions:['OUT'],newPassword:'a'});
@@ -136,3 +136,7 @@ context.saveStaffAccount('secret',{id:inonly.id,account:'inonly',permissions:['O
 context.saveStaffAccount('secret',{id:inonly.id,account:'inonly',permissions:[],newPassword:''});assert.throws(()=>context.verifyStaff_('inonly','q','OUT'),/Incorrect/);
 assert.throws(()=>context.saveStaffAccount('secret',{account:'bad',permissions:['BAD'],newPassword:'p'}),/valid Stock/);
 console.log('PASS permission Status: no public Type, IN-only/OUT-only/both/no-access, permission revocation, passwords preserved and fresh admin authorization enforced.');
+
+const nativeRequest={...req,requestId:'native_capture_0001',type:'OUT',account:'ordinary',staffPassword:'p',photoSource:'device-capture',capturedAt:new Date().toISOString(),quantity:1};
+context.submitMovement(nativeRequest);assert.equal(sheets.Transactions.find(r=>r[0]===nativeRequest.requestId)[12],'device-capture');
+console.log('PASS native photo: device-capture submission accepted and its distinct source retained for audit.');

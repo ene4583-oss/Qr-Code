@@ -58,7 +58,7 @@ function submitMovement(data) {
     if (['IN','OUT'].indexOf(data.type)<0) throw new Error('Invalid movement type');
     var staff=verifyStaff_(data.account,data.staffPassword,data.type);
     var captured=Date.parse(data.capturedAt||'');
-    if(data.photoSource!=='camera'||!isFinite(captured)||Date.now()-captured>10*60*1000||captured-Date.now()>60000)throw new Error('Take a fresh face photo using the live camera. Check your device clock if this message persists.');
+    if(['camera','device-capture'].indexOf(data.photoSource)<0||!isFinite(captured)||Date.now()-captured>10*60*1000||captured-Date.now()>60000)throw new Error('Take or select the face photo again. Check your device clock if this message persists.');
     var p=products_().filter(function(x){return x.code===data.code;})[0];
     if (!p||inactive_(p)) throw new Error('Product not found or inactive');
     if(data.type==='OUT'&&qty>p.stock) throw new Error('Unable to issue items. Please contact the administrator to check stock.');
@@ -70,7 +70,7 @@ function submitMovement(data) {
     if(!folderId) throw new Error('The administrator has not configured the photo folder.');
     var ext=match[1].split('/')[1];
     var file=DriveApp.getFolderById(folderId).createFile(Utilities.newBlob(bytes,match[1],data.requestId+'.'+ext));
-    try { transactionSheet_().appendRow([data.requestId,new Date(),p.code,data.type,qty,safe_(staff.account),'',file.getUrl(),'','',staff.type==='Foreman'?staff.id:'',staff.type==='Foreman'?safe_(staff.account):'','camera',new Date(captured).toISOString(),staff.id,staff.type,safe_(staff.account)]); SpreadsheetApp.flush(); }
+    try { transactionSheet_().appendRow([data.requestId,new Date(),p.code,data.type,qty,safe_(staff.account),'',file.getUrl(),'','',staff.type==='Foreman'?staff.id:'',staff.type==='Foreman'?safe_(staff.account):'',data.photoSource,new Date(captured).toISOString(),staff.id,staff.type,safe_(staff.account)]); SpreadsheetApp.flush(); }
     catch(e) { file.setTrashed(true);throw e; }
     var next=Math.round((p.stock+(data.type==='IN'?qty:-qty))*1000)/1000;
     if(data.type==='IN'&&next>p.threshold) setOrdered_(p.code,false);

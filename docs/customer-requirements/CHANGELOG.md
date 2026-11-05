@@ -9,3 +9,5 @@ Further revision: both movements require Type/Account/Password and a simple live
 Status refinement: remove account Type, show Account/Status/Action, and select IN/OUT/both permissions. Operation permission is authoritative rather than a role. Existing role-based access is mapped without expansion.
 
 Direct-camera refinement: a separate HTTPS camera page avoids requesting webcam access inside the inventory iframe. No gallery fallback is added. GitHub Pages hosting and actual phone capture remain deployment prerequisites.
+
+Client accepted the simpler native phone capture flow instead of independent camera hosting. Capture may expose a photo-library/file option depending on browser; strict live-only assurance is no longer claimed. No GitHub Pages activation is required.

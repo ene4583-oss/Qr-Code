@@ -272,3 +272,15 @@ The camera entrypoint does not expose an upload route. Browser/devtools tamperin
 ### Verification
 
 The browser tests now serve both index.html and camera.html. The sandbox test explicitly blocks camera permission in the inventory iframe but allows it in the separate top-level camera response; it checks capture delivery and rejection of forged messages. The stock tests use simulated cameras and confirm permissions, photos, inventory changes and administrator operations. Physical devices still need a /dev test after Pages is enabled.
+
+## Current simplified photo flow — native phone capture (client-approved)
+
+The independent HTTPS camera page and GitHub Pages setup are **not required** by the current inventory UI. They remain in the repository only for compatibility with previously published versions. The current **Upload face photo** control directly activates a hidden image input with `capture="user"`, requesting the phone's native camera. There is no custom camera dialog, switch-camera settings panel, popup or new camera website.
+
+**Accepted limitation:** capture is a browser hint, not an enforced security boundary. Some phone/browser combinations also offer photo-library selection; desktop browsers may show a file picker. There is no strict live-capture guarantee in this simplified version. Use the full Chrome/Safari browser rather than an in-app browser and verify actual behavior on the intended phone.
+
+The selected image is resized and converted to JPEG before submission. Native-photo entries are recorded with `photoSource=device-capture` so they are not falsely labelled as a verified live-webcam capture. The existing capturedAt field records preparation time for this flow, not attested camera/EXIF time. Supported camera/browser image decoding varies; actual iPhone/Android photos need a device test. Existing account/password checks, IN/OUT permissions, stock checks and private Drive storage remain unchanged.
+
+Update **both Code.gs and Index.html**, save and test /dev; no Sheet reimport, new property, new Google permission or Pages deployment is needed for the native input. The backend accepts the explicit device-capture source while retaining the old camera source for existing compatible requests. Quantity/photo and authorization checks remain in place.
+
+Local tests check the button's native input activation, image conversion/preview, invalid-file rejection, authenticated stock changes and an iframe with webcam permission blocked. These tests do not prove that a phone OS forces its camera rather than a picker.
