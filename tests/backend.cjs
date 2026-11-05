@@ -88,7 +88,7 @@ console.log('PASS reorder email: inline product images, stock/threshold/replenis
 assert.throws(()=>context.saveForemanAccounts('wrong',accounts),/administrator password/);
 assert.throws(()=>context.getForemanAccounts('wrong'),/administrator password/);
 assert.throws(()=>context.saveForemanAccounts('secret',accounts.slice(0,5)),/six/);
-assert.throws(()=>context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:'short'}))),/8–128/);
+context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:a.id==='F2'?'x':a.newPassword})));assert.equal(context.verifyForeman_('F2','x').id,'F2');context.saveForemanAccounts('secret',accounts);
 assert.throws(()=>context.verifyForeman_('F1','secret'),/Incorrect foreman/);
 assert.throws(()=>context.verifyForeman_('F1','ForemanPass2'),/Incorrect foreman/);
 assert.equal(context.verifyForeman_('F2','ForemanPass2').name,'Foreman 2');
@@ -108,3 +108,9 @@ console.log('PASS foreman receipts: six private password slots, admin-only confi
 context.saveForemanAccounts('secret',accounts.map(a=>({...a,newPassword:a.id==='F2'?'OnlyLettersAllowed':'',enabled:a.id==='F2'})));
 assert.equal(context.verifyForeman_('F2','OnlyLettersAllowed').id,'F2');
 console.log('PASS letters-only foreman password accepted; no numeric-character requirement.');
+
+const longPassword='letters'.repeat(30);
+context.saveForemanAccounts('secret',accounts.map(a=>({...a,enabled:a.id==='F2',newPassword:a.id==='F2'?longPassword:''})));
+assert.equal(context.verifyForeman_('F2',longPassword).id,'F2');
+assert.throws(()=>context.verifyForeman_('F2',''),/Incorrect foreman/);
+console.log('PASS password length: one-character and >128-character passwords accepted; empty login password rejected.');

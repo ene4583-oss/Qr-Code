@@ -168,7 +168,7 @@ Upgrade both Code.gs and Index.html. HTTPS product image retrieval uses UrlFetch
 These revisions supersede older notes describing Purpose as required or stock receipts as administrator-authorized:
 
 - Purpose is removed from both Stock in and Stock out. No new purpose is collected. Historical `note` cells remain for past records and schema compatibility.
-- Stock in requires one of **six independent foreman accounts**, with the selected foreman's own password. The administrator password alone no longer authorizes a receipt. Manage these under **Manage inventory → Foreman access**: name each slot F1–F6, set a password (8–128 characters), enable it and save. Leave a password blank to keep the existing one; disable a slot to revoke access. No accounts or passwords are enabled by default.
+- Stock in requires one of **six independent foreman accounts**, with the selected foreman's own password. The administrator password alone no longer authorizes a receipt. Manage these under **Manage inventory → Foreman access**: name each slot F1–F6, set a non-empty password (no configured length requirement), enable it and save. Leave a password blank to keep the existing one; disable a slot to revoke access. No accounts or passwords are enabled by default.
 - Foreman secrets are held in Script Properties as salted HMAC hashes under FOREMAN_ACCESS_V1, not in the public Settings table. Only the enabled foreman names/slot IDs are public; password material is never returned. Backend checks apply to each stock-in submission. Five wrong passwords block a slot for approximately five minutes (script cache is best-effort, not a complete identity service).
 - Stock in uses **Open camera / Retake → Take face photo**, preferring the front camera. It has no file/gallery picker or upload fallback. The browser must permit camera access over HTTPS. Captures must be submitted within ten minutes; the device clock must be reasonably correct. Streams stop after capture, on mode/page changes and when the document is hidden. A separate face photo is cleared after each successful submission. Stock out retains its previous photo picker/camera behavior.
 - This is camera-based evidence, **not face recognition, face detection, biometric identity verification or liveness certification**. The server checks the foreman password and camera/freshness metadata, but a modified client can forge metadata. Real-world face presence and image content are not verified. Staff should understand the photo-recording process and private Drive access arrangement.
@@ -200,6 +200,10 @@ Local tests cover full inventory workflows, front/rear camera selection and an a
 
 ### Password visibility and alphabetic passwords
 
-Foreman passwords may contain letters only; there is no required numeric character. The existing 8–128-character foreman length rule remains. Administrator passwords continue to use the existing Script Property setting.
+Foreman passwords may contain letters only; there is no required numeric character. There is no configured password length rule. Administrator passwords continue to use the existing Script Property setting.
 
 Administrator login, foreman stock-in login and all six foreman password-setting fields now have an accessible eye button to show/hide the entered value. They default to masked, and navigation/mode changes hide visible password fields again. An existing saved password is never sent back to the browser; the eye only reveals what the user has typed. This interface change only requires Index.html to be updated if the latest foreman backend is already installed.
+
+### Password length clarification
+
+The client has requested no fixed password length. Foreman password configuration and verification no longer impose minimum or maximum character counts; the browser fields have no minlength/maxlength attributes. Non-empty passwords are still required to enable or log into an account. Leaving an existing password blank when editing keeps it unchanged. Show/hide controls and independent foreman passwords remain. Update both Code.gs and Index.html for this change.

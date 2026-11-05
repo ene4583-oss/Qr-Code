@@ -290,7 +290,6 @@ function saveForemanAccounts(password,accounts){
       if(matches.length!==1)throw new Error('Each foreman slot must appear exactly once.');
       var input=matches[0],previous=old.filter(function(x){return x.id===id;})[0]||{},name=String(input.name||'').trim(),nextPassword=String(input.newPassword||'');
       if(!name||name.length>80||typeof input.enabled!=='boolean')throw new Error('Enter a foreman name of 1–80 characters and a valid enabled status.');
-      if(nextPassword&&(nextPassword.length<8||nextPassword.length>128))throw new Error('New foreman passwords must contain 8–128 characters.');
       var salt=previous.salt||Utilities.getUuid(),hash=previous.hash||'';
       if(nextPassword){salt=Utilities.getUuid();hash=foremanPasswordHash_(nextPassword,salt);}
       if(input.enabled&&!hash)throw new Error('Set a password before enabling '+id+'.');
@@ -302,7 +301,7 @@ function saveForemanAccounts(password,accounts){
 }
 function verifyForeman_(id,password){
   var account=foremanConfig_().filter(function(x){return x.id===id&&x.enabled&&x.hash;})[0];
-  if(!account||!password||String(password).length>128)throw new Error('Incorrect foreman account or password.');
+  if(!account||!password)throw new Error('Incorrect foreman account or password.');
   var cache=CacheService.getScriptCache(),key='foreman-fail-'+id,count=Number(cache.get(key)||0);
   if(count>=5)throw new Error('Too many failed attempts. Try again in 5 minutes.');
   var actual=foremanPasswordHash_(password,account.salt),different=actual.length^account.hash.length;
