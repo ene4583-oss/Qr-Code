@@ -185,3 +185,7 @@ These revisions supersede older notes describing Purpose as required or stock re
 5. Once verified, update the **existing deployment** to a new version, preserving its /exec URL and QR labels.
 
 Run `node tests/backend.cjs`, `node tests/browser.cjs`, and `node tests/foreman-browser.cjs` for local checks. The foreman browser test uses simulated media; no real person's face is collected during automated tests. Tests do not establish that the production Google iframe allows camera access.
+
+### Camera clarification — employee or foreman
+
+The foreman may photograph the employee or themselves. Stock in now offers **Front camera — photograph yourself** and **Rear camera — photograph an employee**. Changing the selection stops the previous stream, clears the previous capture and opens the selected camera. If the browser reports a different available camera, the interface explains the fallback. Available hardware and Google iframe permissions still govern actual camera use. The receipt records the authenticated operating foreman; it does not claim to identify the person in the photo. No recognition/liveness checks or gallery upload are added. This refinement only changes Index.html.
