@@ -56,7 +56,7 @@ function submitMovement(data) {
     var qty=Number(data.quantity);
     if (!isFinite(qty)||qty<=0||qty>1000000||Math.abs(Math.round(qty*1000)-qty*1000)>0.000001) throw new Error('Quantity must be positive, with at most three decimal places.');
     if (['IN','OUT'].indexOf(data.type)<0) throw new Error('Invalid movement type');
-    var staff=verifyStaff_(String(data.staffType||''),data.account,data.staffPassword,data.type);
+    var staff=verifyStaff_(data.account,data.staffPassword,data.type);
     var captured=Date.parse(data.capturedAt||'');
     if(data.photoSource!=='camera'||!isFinite(captured)||Date.now()-captured>10*60*1000||captured-Date.now()>60000)throw new Error('Take a fresh face photo using the live camera. Check your device clock if this message persists.');
     var p=products_().filter(function(x){return x.code===data.code;})[0];
@@ -271,12 +271,18 @@ function staffConfig_(){
  foremanConfig_().forEach(function(old){if(!accounts[old.id])accounts[old.id]={id:old.id,account:old.id,name:old.name,type:'Foreman',enabled:!!old.enabled,salt:old.salt,hash:old.hash,legacy:true};});
  return Object.keys(accounts).map(function(id){return accounts[id];});
 }
-function getStaffAccounts(password){verifyAdmin_(password);return staffConfig_().filter(function(a){return !a.deletedAt;}).map(function(a){return {id:a.id,account:a.account,type:a.type,enabled:a.enabled,hasPassword:!!a.hash,legacy:!!a.legacy};});}
+function staffPermissions_(a){
+ if(a.deletedAt||a.enabled===false)return [];
+ var permissions=Array.isArray(a.permissions)?a.permissions:(a.type==='Foreman'?['IN','OUT']:['OUT']);
+ return ['IN','OUT'].filter(function(p){return permissions.indexOf(p)>=0;});
+}
+function getStaffAccounts(password){verifyAdmin_(password);return staffConfig_().filter(function(a){return !a.deletedAt;}).map(function(a){return {id:a.id,account:a.account,permissions:staffPermissions_(a),hasPassword:!!a.hash,legacy:!!a.legacy};});}
 function saveStaffAccount(adminPassword,data){
  verifyAdmin_(adminPassword);
- var account=String(data&&data.account||'').trim(),id=String(data&&data.id||''),type=data&&data.type,newPassword=String(data&&data.newPassword||'');
+ var account=String(data&&data.account||'').trim(),id=String(data&&data.id||''),permissions=data&&data.permissions,newPassword=String(data&&data.newPassword||'');
  if(!/^[A-Za-z0-9][A-Za-z0-9_.@-]{0,79}$/.test(account))throw new Error('Account must be 1–80 letters, numbers, dots, @, hyphens or underscores.');
- if(['Foreman','Staff'].indexOf(type)<0||typeof data.enabled!=='boolean')throw new Error('Choose a valid account type and status.');
+ if(!Array.isArray(permissions)||permissions.length>2||permissions.some(function(p){return ['IN','OUT'].indexOf(p)<0;})||permissions.some(function(p,i){return permissions.indexOf(p)!==i;}))throw new Error('Select valid Stock in / Stock out permissions.');
+ permissions=['IN','OUT'].filter(function(p){return permissions.indexOf(p)>=0;});
  var lock=LockService.getScriptLock();lock.waitLock(30000);
  try{
   var all=staffConfig_(),old=id?all.filter(function(a){return a.id===id&&!a.deletedAt;})[0]:null;
@@ -285,8 +291,8 @@ function saveStaffAccount(adminPassword,data){
   if(!old&&!newPassword)throw new Error('Set a password for the new account.');
   var salt=old&&old.salt||Utilities.getUuid(),hash=old&&old.hash||'';
   if(newPassword){salt=Utilities.getUuid();hash=staffPasswordHash_(newPassword,salt);}
-  if(data.enabled&&!hash)throw new Error('Set a password before enabling this account.');
-  var value={id:old?old.id:Utilities.getUuid(),account:account,name:account,type:type,enabled:data.enabled,salt:salt,hash:hash,updatedAt:new Date().toISOString()};
+  if(permissions.length&&!hash)throw new Error('Set a password before enabling this account.');
+  var value={id:old?old.id:Utilities.getUuid(),account:account,name:account,type:old&&old.type||'Staff',permissions:permissions,enabled:permissions.length>0,salt:salt,hash:hash,updatedAt:new Date().toISOString()};
   PropertiesService.getScriptProperties().setProperty('STAFF_ACCOUNT_V2_'+value.id,JSON.stringify(value));
   return {ok:true,message:old?'Staff account updated.':'Staff account added.'};
  }finally{lock.releaseLock();}
@@ -298,11 +304,10 @@ function deleteStaffAccount(adminPassword,id){
   return {ok:true,message:'Staff account deleted. Existing transaction history is retained.'};
  }finally{lock.releaseLock();}
 }
-function verifyStaff_(type,account,password,movement){
- account=String(account||'').trim();var person=staffConfig_().filter(function(a){return !a.deletedAt&&a.enabled&&a.account.toLowerCase()===account.toLowerCase()&&a.type===type&&a.hash;})[0];
- if(!person||!password)throw new Error('Incorrect type, account or password.');
- if(movement==='IN'&&person.type!=='Foreman')throw new Error('Only Foreman accounts can record stock in.');
+function verifyStaff_(account,password,movement){
+ account=String(account||'').trim();var person=staffConfig_().filter(function(a){return !a.deletedAt&&a.enabled&&a.account.toLowerCase()===account.toLowerCase()&&a.hash;})[0];
+ if(!person||!password)throw new Error('Incorrect account or password.');
  var cache=CacheService.getScriptCache(),key='staff-fail-'+person.id,count=Number(cache.get(key)||0);if(count>=5)throw new Error('Too many failed attempts. Try again in 5 minutes.');
  var actual=staffPasswordHash_(password,person.salt),diff=actual.length^person.hash.length;for(var i=0;i<actual.length;i++)diff|=actual.charCodeAt(i)^person.hash.charCodeAt(i);
- if(diff){cache.put(key,String(count+1),300);throw new Error('Incorrect type, account or password.');}cache.remove(key);return person;
+ if(diff){cache.put(key,String(count+1),300);throw new Error('Incorrect account or password.');}cache.remove(key);if(staffPermissions_(person).indexOf(movement)<0)throw new Error('This account is not allowed to use '+(movement==='IN'?'Stock in':'Stock out')+'.');return person;
 }

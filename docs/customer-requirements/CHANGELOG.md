@@ -5,3 +5,5 @@ Purpose removed from Stock in/out. Stock in restricted to six independently conf
 Camera clarification: the foreman may photograph the employee or themselves using a front/rear selector. The authenticated operator and photographed person need not be the same.
 
 Further revision: both movements require Type/Account/Password and a simple live capture. Staff accounts moves to a separate dynamic management page; fresh admin password is required for every change. Foreman-only stock in remains. Older fixed six-slot descriptions are superseded.
+
+Status refinement: remove account Type, show Account/Status/Action, and select IN/OUT/both permissions. Operation permission is authoritative rather than a role. Existing role-based access is mapped without expansion.
