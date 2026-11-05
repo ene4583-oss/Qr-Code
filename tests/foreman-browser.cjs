@@ -1,0 +1,27 @@
+const {chromium}=require('playwright'),assert=require('assert/strict'),fs=require('fs'),path=require('path'),http=require('http');
+const root=path.resolve(__dirname,'..');
+(async()=>{
+ const server=http.createServer((req,res)=>{res.setHeader('Content-Type','text/html');res.end(fs.readFileSync(path.join(root,'index.html')));});await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream']});
+ try{
+ const context=await browser.newContext({permissions:['camera']}),p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='warning')console.log(m.text());});
+ await p.route('https://raw.githubusercontent.com/ene4583-oss/Qr-Code/main/assets/products/*',r=>r.fulfill({path:path.join(root,'assets/products',r.request().url().split('/').pop()),contentType:'image/jpeg'}));
+ await p.goto('http://127.0.0.1:'+server.address().port+'/?item=DU01');await p.waitForSelector('#item option',{state:'attached'});assert.equal(await p.locator('#note').count(),0);
+ await p.click('#nav-admin');await p.fill('#adminPassword','demo123');await p.click('#loginButton');await p.waitForSelector('#alertDialog[open]');await p.click('#alertDialog button');assert.equal(await p.locator('.foreman-card').count(),6);
+ for(const [id,name,pw] of [['F1','Foreman One','FirstForeman123'],['F2','Foreman Two','SecondForeman123']]){const card=p.locator('.foreman-card[data-id="'+id+'"]');await card.locator('.foreman-name').fill(name);await card.locator('.foreman-new-password').fill(pw);await card.locator('.foreman-enabled').check();}
+ await p.click('#saveForemen');await p.waitForFunction(()=>document.getElementById('foremanSettingsStatus').textContent.includes('saved'));
+ assert(!(await p.evaluate(()=>localStorage.getItem('stockflow-v1'))).includes('FirstForeman123'));assert.equal(await p.locator('.foreman-new-password').first().inputValue(),'');
+ await p.click('#nav-worker');await p.click('#inTab');await p.waitForSelector('#foremanSelect option[value="F1"]',{state:'attached'});await p.selectOption('#foremanSelect','F1');await p.fill('#quantity','1');await p.fill('#inPassword','demo123');
+ assert(!(await p.locator('#photo').isVisible()));assert(!(await p.locator('#employee').isVisible()));assert.equal(await p.locator('#note').count(),0);
+ await p.click('#openFaceCameraButton');await p.waitForFunction(()=>document.getElementById('faceVideo').videoWidth>0&&!document.getElementById('captureFaceButton').disabled).catch(async e=>{console.error('Camera diagnostics',await p.evaluate(()=>({status:document.getElementById('cameraStatus').textContent,videoWidth:document.getElementById('faceVideo').videoWidth,videoState:document.getElementById('faceVideo').readyState,visibility:document.visibilityState,secure:isSecureContext})));throw e;});await p.click('#captureFaceButton');await p.waitForSelector('#photoPreview:not(.hidden)');assert(await p.locator('#faceVideo').evaluate(v=>v.srcObject===null));
+ await p.click('#submitButton');await p.waitForFunction(()=>document.getElementById('toast').textContent.includes('Incorrect foreman'));assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('stockflow-v1')).transactions.length),0);
+ await p.fill('#inPassword','FirstForeman123');await p.click('#submitButton');await p.waitForFunction(()=>JSON.parse(localStorage.getItem('stockflow-v1')).transactions.length===1);
+ const record=await p.evaluate(()=>JSON.parse(localStorage.getItem('stockflow-v1')).transactions[0]);assert.equal(record.foremanId,'F1');assert.equal(record.photoSource,'camera');assert.equal(record.note,'');assert(!JSON.stringify(record).includes('FirstForeman123'));
+ await p.click('#nav-admin');await p.waitForFunction(()=>document.querySelector('#inventoryRows tr td:nth-child(2)').textContent==='49');assert(await p.locator('#inventoryRows .product-thumb').count()>0);assert.equal(await p.locator('#transactionRows .product-thumb').count(),1);assert.equal(await p.locator('#inventoryRows .product-thumb').first().evaluate(i=>Math.round(i.getBoundingClientRect().width)),42);
+ // Permission failure must never reveal a file-upload fallback for stock in.
+ await p.click('#nav-worker');await p.evaluate(()=>{navigator.mediaDevices.getUserMedia=()=>Promise.reject(new DOMException('Denied','NotAllowedError'));});await p.click('#openFaceCameraButton');await p.waitForFunction(()=>document.getElementById('cameraStatus').textContent.includes('Camera could not open'));assert(!(await p.locator('#photo').isVisible()));assert(await p.locator('#captureFaceButton').isDisabled());
+ await p.click('#outTab');assert(await p.locator('#photo').isVisible());assert(await p.locator('#employee').isVisible());assert.equal(await p.locator('#note').count(),0);
+ await p.setViewportSize({width:390,height:844});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);
+ console.log('PASS foreman browser: six slots; separate password setup without plaintext persistence; no Purpose; stock-in has camera only; capture/stop; admin password denied; foreman receipt recorded; 42px product thumbnails; camera denial without file fallback; stock-out file upload unchanged; mobile layout.');
+ }finally{await browser.close();server.close();}
+})().catch(e=>{console.error(e);process.exit(1);});

@@ -1,16 +1,16 @@
 # Stock Inventory Website — Customer Requirements Review
 
-For customer review, not completion or acceptance certification. Mark each requirement Confirmed, Change requested or Out of scope, and add comments.
+Version 1.1 | 5 November 2026 | Customer decisions remain pending.
 
 | ID | User | Function | Requirement | Review check / expected behavior | Proposed priority | Customer decision | Comments / changes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | R01 | Worker | Scan product QR | Scan a label with a phone camera to open the matching product form. | Correct product selected automatically; unavailable codes do not silently select another item. | Required | Pending |  |
 | R02 | Worker | Product information | Show product code, name, image when available and unit. Hide stock quantities from workers. | The worker can identify the product without seeing its stock balance. | Required | Pending |  |
-| R03 | Worker | Stock issue form | Enter employee ID and quantity, attach a photo, and optionally add a note. | Missing ID/photo or a non-positive quantity is rejected. IDs can contain letters or leading zeroes. | Required | Pending |  |
-| R04 | System | Automatic stock calculation | An issue deducts stock; an administrator receipt adds stock. | From 10 units: issue 1 gives 9; receive 1 gives 10. Insufficient stock is rejected. | Required | Pending |  |
-| R05 | Administrator | Stock receipts | Require the administrator password when recording incoming stock. | A receipt without valid administrator authorization is rejected. | Required | Pending |  |
+| R03 | Worker | Stock issue form | Enter employee ID and quantity and attach a photo. Purpose is not collected. | Missing ID/photo or non-positive quantity is rejected. The Purpose field is absent. | Required | Pending |  |
+| R04 | System | Automatic stock calculation | An issue deducts stock; an authorized foreman receipt adds stock. | From 10 units: issue 1 gives 9; receive 1 gives 10. Insufficient stock is rejected. | Required | Pending |  |
+| R05 | Foreman | Foreman-only receipts and live face photo | Select one of six foreman accounts, enter its own password, and take a face photo with the live front camera. No Purpose or file/gallery upload for receipts. | Admin password alone cannot authorize stock in. A disabled/wrong account, file-source or stale photo is rejected. Intended phone camera operation must be tested. This is not face recognition/liveness verification. | Required | Pending |  |
 | R06 | System | Prevent duplicate movements | Retrying the same submission must not apply the stock change twice. | Retrying one recorded request leaves only one active stock effect. | Required | Pending |  |
-| R07 | Administrator | Inventory and history | View stock balances, units and recent movements, including employee ID, time and photo references. | An administrator can check a recorded movement and open its photo with the necessary Drive permission. | Required | Pending |  |
+| R07 | Administrator | Inventory and history | View balances, units and movements with employee/foreman, time, photos and small product thumbnails beside codes. | An admin can identify the product from a 42px thumbnail, check its record and open its evidence photo with Drive permission. | Required | Pending |  |
 | R08 | Administrator | Add and edit products | Maintain code, name, category, unit, opening balance, threshold and product image. | New active products appear in the worker list. Codes are unique and stable; units cannot change after transactions exist. | Required | Pending |  |
 | R09 | Administrator | Delete and restore products | Remove a product from active use while retaining its history, and restore it if needed. | Deleted products cannot accept new movements. Restoration keeps the same code and history. | Required | Pending |  |
 | R10 | Administrator | Product photo upload | Choose a product and upload or replace its display photo. | The new photo appears on the worker form and regenerated labels after reloading. Transaction photos remain separate. | Required | Pending |  |
@@ -19,18 +19,6 @@ For customer review, not completion or acceptance certification. Mark each requi
 | R13 | Administrator | Reorder notifications | Display low-stock alerts while the admin page is open; optionally send threshold-crossing email. | The open dashboard checks about every 30 seconds. Configured email is attempted when stock crosses down to/below the threshold. | Optional | Pending |  |
 | R14 | Administrator | Select and print QR labels | Tick one, several or all products; review the selected list and remove accidental selections. | Only selected products are printed, with code, name, unit, QR, available photo and optional label text. | Required | Pending |  |
 | R15 | Administrator | Company name and logo | Change the displayed company name and upload, replace or remove the logo. | Saved branding appears on the website and newly generated labels; other devices reload to see changes. | Optional | Pending |  |
-| R16 | Administrator / System | Access and shared records | Use one shared Google Sheets record store and restrict management actions to administrators. | Two administrators see the same records after refresh. Worker requests cannot access administrator actions without valid credentials. | Required | Pending |  |
+| R16 | Administrator / System | Access and foreman account settings | Use shared Sheet records; restrict management to admins. Admins configure/reset/disable six independent foreman accounts for stock in. | Foreman passwords are not shown or written to transactions. Separate credentials authorize receipts. Admin-only operations remain protected. | Required | Pending |  |
 
-## Operating Conditions and Scope
-
-Internet access is required; use a phone browser or computer. Verify opening stock by a physical count before launch.
-
-Administrators currently share one password and equal permissions. Employee IDs are user-entered, not verified identities.
-
-Photos are private in Drive and need the appropriate Google permissions to view. Product display photos and company logos are visible to website users.
-
-If anonymous access is enabled, anyone holding the link can submit an issue. The customer must confirm the access arrangement and photo-collection process.
-
-Offline submissions, WhatsApp/Telegram/SMS and lock-screen push are not included. Email depends on authorization, quotas and delivery.
-
-Changing names/photos retains fixed product codes. A new deployment URL or Google-account migration may require replacement QR labels.
+Live stock-in camera must be tested on the intended Google deployment and phones. No face recognition or liveness assurance is claimed.

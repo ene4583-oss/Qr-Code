@@ -162,3 +162,26 @@ Reorder emails now include the product code/name, current stock and unit, thresh
 **Purpose / Notes is required for Stock out**, including a server-side whitespace check. Stock in notes remain optional. Existing records are unchanged.
 
 Upgrade both Code.gs and Index.html. HTTPS product image retrieval uses UrlFetchApp and may require an additional Google permission: run setup from the editor as the owning account and grant any new permissions, without clearing sheets or properties. Then test the saved code and update the existing deployment to a new version. No database reimport or QR replacement is needed. Validate actual email delivery and rendering in the owner's Gmail after deployment; local tests verify the email payload with mocked Google services.
+
+## Client revisions — 5 November 2026 (current behavior)
+
+These revisions supersede older notes describing Purpose as required or stock receipts as administrator-authorized:
+
+- Purpose is removed from both Stock in and Stock out. No new purpose is collected. Historical `note` cells remain for past records and schema compatibility.
+- Stock in requires one of **six independent foreman accounts**, with the selected foreman's own password. The administrator password alone no longer authorizes a receipt. Manage these under **Manage inventory → Foreman access**: name each slot F1–F6, set a password (8–128 characters), enable it and save. Leave a password blank to keep the existing one; disable a slot to revoke access. No accounts or passwords are enabled by default.
+- Foreman secrets are held in Script Properties as salted HMAC hashes under FOREMAN_ACCESS_V1, not in the public Settings table. Only the enabled foreman names/slot IDs are public; password material is never returned. Backend checks apply to each stock-in submission. Five wrong passwords block a slot for approximately five minutes (script cache is best-effort, not a complete identity service).
+- Stock in uses **Open camera / Retake → Take face photo**, preferring the front camera. It has no file/gallery picker or upload fallback. The browser must permit camera access over HTTPS. Captures must be submitted within ten minutes; the device clock must be reasonably correct. Streams stop after capture, on mode/page changes and when the document is hidden. A separate face photo is cleared after each successful submission. Stock out retains its previous photo picker/camera behavior.
+- This is camera-based evidence, **not face recognition, face detection, biometric identity verification or liveness certification**. The server checks the foreman password and camera/freshness metadata, but a modified client can forge metadata. Real-world face presence and image content are not verified. Staff should understand the photo-recording process and private Drive access arrangement.
+- The Google Apps Script iframe/browser permissions policy can restrict getUserMedia. A local browser test with a simulated camera has passed; actual Google-hosted phone capture still requires a deployment check. If the camera is blocked, the UI refuses gallery fallback; do not publish the new stock-in flow until camera access has been verified on the intended devices. An external HTTPS frontend may be needed if the host policy prevents camera access.
+- Manage inventory and recent transactions show **42px product thumbnails** beside codes, including a fallback when an image is unavailable. Private product-image display data is resolved separately from the editable image reference.
+- Transactions gain additive columns K–N: foremanId, foremanName, photoSource, capturedAt. Original columns A–J, existing transactions/photos and void information remain. Foreman identity is recorded server-side for receipts; no password is stored in transaction rows. The capturedAt value is client-supplied metadata, not trusted capture attestation.
+
+### Upgrade checklist
+
+1. Keep existing Sheet/Drive IDs, email and admin password. Do not reimport or clear data.
+2. Replace both Code.gs and Index.html, then use a test deployment.
+3. Sign in as administrator, configure the six foreman slots, and save. Share each password privately with its owner.
+4. On an actual target phone, test the live front camera, wrong/correct foreman password, a receipt and stock increase. Also verify stock-out needs no Purpose and thumbnails display.
+5. Once verified, update the **existing deployment** to a new version, preserving its /exec URL and QR labels.
+
+Run `node tests/backend.cjs`, `node tests/browser.cjs`, and `node tests/foreman-browser.cjs` for local checks. The foreman browser test uses simulated media; no real person's face is collected during automated tests. Tests do not establish that the production Google iframe allows camera access.
